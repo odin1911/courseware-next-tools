@@ -1,0 +1,70 @@
+/* ── 全局重置 ── */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  outline: none;
+}
+
+[role='button'][tabindex] {
+  outline: none;
+}
+
+[role='button'][tabindex]:focus,
+[role='button'][tabindex]:focus-visible {
+  outline: none;
+}
+
+@font-face {
+  font-family: 'heiti';
+  src: local('heiti'), url('./huawen.ttf');
+}
+
+@font-face {
+  font-family: 'Primer Print';
+  src: local('Primer Print'), url('./primer_print.ttf');
+}
+
+@font-face {
+  font-family: 'arial';
+  src: local('arial'), url('./arial.ttf');
+}
+
+body,
+ul,
+li,
+ol,
+dl,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+input,
+p {
+  margin: 0;
+}
+ul,
+ol {
+  padding: 0;
+}
+img {
+  border: none;
+}
+a {
+  text-decoration: none;
+}
+li {
+  list-style: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
