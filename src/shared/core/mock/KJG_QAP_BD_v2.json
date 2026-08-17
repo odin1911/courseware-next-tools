@@ -1,0 +1,140 @@
+{
+    "unit_id": 29827,
+    "unit_name": "Review 2",
+    "unit_group_id": 7534,
+    "unit_group_name": "Fall",
+    "course_id": 1896,
+    "course_name": "武汉新东方 Pop Ready 4",
+    "course_font": "default",
+    "course_style_id": "kj_teens",
+    "common_bg": "26e4359410fb707750aca83e6abc9137404e1560bc95fb8d16bc5b045f872c08.png.zip",
+    "title_image": "d95009562ed3e658215fdfbea1e54b46105e66c6789b083d355213e4076c0338.zip",
+    "akf_tags": [],
+    "exercises_data": [
+        {
+            "data": {
+                "id": "924702",
+                "type": "exercises",
+                "attributes": {
+                    "name": "Burger Diner",
+                    "position": 6,
+                    "additional-attributes": {
+                        "exercise-source": "create",
+                        "title-image": "",
+                        "background-image": "",
+                        "question-setting": {
+                            "auto-generated": {
+                                "modules": [
+                                    "KJG_A",
+                                    "KJG_I"
+                                ],
+                                "count": 10,
+                                "is-shuffle": true
+                            },
+                            "manual-module": null,
+                            "is-shuffle": "random"
+                        }
+                    },
+                    "instruction-en": null,
+                    "instruction-cn": null,
+                    "display-level": 1,
+                    "nav-name": "Burger Diner",
+                    "navigation-icon-id": "",
+                    "navigation-bg-color-hover": "",
+                    "navigation-bg-color": "",
+                    "is-interactive-quiz": false,
+                    "instruction-en-audio": null,
+                    "instruction-cn-audio": null,
+                    "dictionaries": [],
+                    "marc-word-banks": [
+                        {
+                            "word": "lion",
+                            "audio-resources": "41dc902a2ffd0c1711573e25e10635e8aa82a850ff731bcaa5b316f5599fc490.mp3",
+                            "image-resources": "aa225b13035516cc2b3cf457eac51e1a9cd2fd0227e5c17089ed395e857ea281.zip"
+                        },
+                        {
+                            "word": "bee",
+                            "audio-resources": "89f6dd35716716402429b4c06b697ad9c22642e370a0af10f5c9739d6b0b7885.mp3",
+                            "image-resources": "03a54329b453ba4a77f6640cf21c5a51d0e234b0c8a7112cd9860a19ce745320.zip"
+                        },
+                        {
+                            "word": "ant",
+                            "audio-resources": "b086745c56fb59a68fdf964e5c5a29b3d4f73a68500397589494aa26b48c51db.mp3",
+                            "image-resources": "a9be9443a6bdb6dd69b458230aa3eb3c1730821e4397ea834141d9a20b459df1.zip"
+                        },
+                        {
+                            "word": "parrot",
+                            "audio-resources": "0a3da918494e41b23ac9945bc7a3213e82bbd75975802b338f8580ccbffe1ce0.mp3",
+                            "image-resources": "ee2827e93ce61e2cffbce4af3074b9a7a2fd654f4121395c8fc5a872317957b2.zip"
+                        },
+                        {
+                            "word": "bear",
+                            "audio-resources": "8cee7de221ce2e4025d5f4b132216ae0a53d3c87666bd01c8883f0b36a7d4769.mp3",
+                            "image-resources": "7bbd9f21bb52c5fc0379ddcc84fa81c56b4dcbd976c741f42ad7137a58298c79.zip"
+                        },
+                        {
+                            "word": "elephant",
+                            "audio-resources": "2fc43f204a95cafab91dca8fee6b06d14ca0f682ddcb8737d285a88650da3c00.mp3",
+                            "image-resources": "3db27ed6e0f0ab52b1c8e12a8ff7767ef5881ba9114785785d1789d98a4a3c73.zip"
+                        },
+                        {
+                            "word": "butterfly",
+                            "audio-resources": "bba215f4660f4906438f0ce68218016f785a48e1b28fd3a4b862d70d59ca6ab9.mp3",
+                            "image-resources": "d320231b404bdad5d9203f87425f0456684505e4edc53017f8d78bd4c1be8e9c.zip"
+                        }
+                    ]
+                },
+                "relationships": {
+                    "template": {
+                        "data": {
+                            "id": "436",
+                            "type": "templates"
+                        }
+                    },
+                    "questions": {
+                        "data": []
+                    },
+                    "explain": {
+                        "data": {
+                            "id": "-1",
+                            "type": "explain"
+                        }
+                    },
+                    "teacher-tips": {
+                        "data": []
+                    },
+                    "word-banks": {
+                        "data": []
+                    }
+                }
+            },
+            "included": [
+                {
+                    "id": "436",
+                    "type": "templates",
+                    "attributes": {
+                        "name": "Burger Diner v2.0",
+                        "display-name": "Burger Diner v2.0",
+                        "module": "KJG_QAP_BD_v2",
+                        "expected-time": 30,
+                        "is-option-shuffle": false,
+                        "instruction-cn": null,
+                        "instruction-en": ""
+                    }
+                },
+                {
+                    "id": "-1",
+                    "type": "explain",
+                    "attributes": {
+                        "text": ""
+                    },
+                    "relationships": {
+                        "resources": {
+                            "data": []
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

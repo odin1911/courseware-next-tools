@@ -16,5 +16,3 @@ yarn dev
 yarn test
 yarn build
 ```
-
-单页构建：`BUILD_ENTRY=dragonbones-tool yarn build`。

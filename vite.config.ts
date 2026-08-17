@@ -1,15 +1,18 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
-import { pageEntries, type PageEntryName } from './build/generated-entries';
 
 function resolveInput(): Record<string, string> {
-  const only = process.env.BUILD_ENTRY?.trim();
-  if (!only) return { ...pageEntries };
+  const pagesRoot = path.resolve(__dirname, 'src/pages');
 
-  const entry = pageEntries[only as PageEntryName];
-  if (!entry) throw new Error(`Unknown BUILD_ENTRY: ${only}`);
-  return { [only]: entry };
+  return Object.fromEntries(
+    fs
+      .readdirSync(pagesRoot, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => [entry.name, path.join(pagesRoot, entry.name, 'index.html')] as const)
+      .filter(([, htmlFile]) => fs.existsSync(htmlFile)),
+  );
 }
 
 export default defineConfig({

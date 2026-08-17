@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { PixiSkItem } from '@alo7/dragonbones-pixi';
 import type { PixiSkMovie } from '@alo7/dragonbones-pixi';
@@ -13,6 +13,8 @@ const PIXI = _PIXI as any;
 export interface DragonBonesHandle {
   /** 播放指定动画，loop=true 无限循环，loop=false 播一次（默认 false） */
   play: (animationName?: string, loop?: boolean) => void;
+  /** 播放指定名称的内嵌 armature 动画。 */
+  playArmatureAnimation: (armatureName: string, animationName: string, loop?: boolean) => boolean;
   /** 切到指定动画首帧并停止，不触发播放循环 */
   showFirstFrame: (animationName?: string) => void;
   stop: () => void;
@@ -299,7 +301,32 @@ function getMovieContentBounds(movie: MovieWithChildArmatures | null) {
   return mergeDisplayRects(rects);
 }
 
-function fitMovieDisplayToViewport(movie: MovieWithChildArmatures, width: number, height: number) {
+function getMovieAnimationBounds(movie: MovieWithChildArmatures, animationName: string) {
+  const animationData = movie.armatrue?.armatureData.getAnimation(animationName);
+
+  if (!animationData || animationData.frameCount <= 0) {
+    return getMovieContentBounds(movie);
+  }
+
+  const rects: DragonBonesBounds[] = [];
+
+  for (let frame = 0; frame < animationData.frameCount; frame += 1) {
+    gotoMovieFrame(movie, animationName, frame);
+    const bounds = getMovieContentBounds(movie);
+
+    if (bounds) {
+      rects.push(bounds);
+    }
+  }
+
+  return mergeDisplayRects(rects);
+}
+
+export function fitMovieDisplayToViewport(
+  movie: MovieWithChildArmatures,
+  width: number,
+  height: number,
+) {
   const display = movie.display as PixiDisplayLike | null;
 
   if (!display) {
@@ -327,6 +354,55 @@ function fitMovieDisplayToViewport(movie: MovieWithChildArmatures, width: number
 
   display.x = (width - mergedRect.width * scale) / 2 - mergedRect.x * scale;
   display.y = (height - mergedRect.height * scale) / 2 - mergedRect.y * scale;
+
+  return {
+    x: display.x + mergedRect.x * scale,
+    y: display.y + mergedRect.y * scale,
+    width: mergedRect.width * scale,
+    height: mergedRect.height * scale,
+  } satisfies DragonBonesBounds;
+}
+
+export function fitMovieAnimationToViewport(
+  movie: MovieWithChildArmatures,
+  width: number,
+  height: number,
+  animationName: string,
+) {
+  const display = movie.display as PixiDisplayLike | null;
+  const mergedRect = getMovieAnimationBounds(movie, animationName);
+
+  if (!display || !mergedRect || mergedRect.width <= 0 || mergedRect.height <= 0) {
+    return;
+  }
+
+  const padding = 16;
+  const scale = Math.min(
+    Math.max(width - padding * 2, 1) / mergedRect.width,
+    Math.max(height - padding * 2, 1) / mergedRect.height,
+    1,
+  );
+
+  if (!Number.isFinite(scale) || scale <= 0) {
+    return;
+  }
+
+  if (display.scale?.set) {
+    display.scale.set(scale);
+  } else if (display.scale) {
+    display.scale.x = scale;
+    display.scale.y = scale;
+  }
+
+  display.x = (width - mergedRect.width * scale) / 2 - mergedRect.x * scale;
+  display.y = (height - mergedRect.height * scale) / 2 - mergedRect.y * scale;
+
+  return {
+    x: display.x + mergedRect.x * scale,
+    y: display.y + mergedRect.y * scale,
+    width: mergedRect.width * scale,
+    height: mergedRect.height * scale,
+  } satisfies DragonBonesBounds;
 }
 
 function renderDragonBonesStage(app: any) {
@@ -556,9 +632,15 @@ export interface DragonBonesPlayerProps {
   zipUrl: string;
   width?: number;
   height?: number;
+  /** 根骨架显示比例；旧 tamic 2x 骨骼使用 0.5。 */
+  displayScale?: number;
   /** 骨架名，必须显式传入 */
   armature: string;
   fitSize?: boolean;
+  /** 默认保持旧版当前帧适配；工具预览可按完整动作范围适配。 */
+  fitMode?: 'current-frame' | 'animation-bounds';
+  /** 调试用：显示 fitSize 采用的全帧范围和画布中心线 */
+  showDebugBounds?: boolean;
   forceCanvas?: boolean;
   excludedChildArmatureNames?: readonly string[];
   /** 加载完成后自动循环播放第一个动画，默认 true */
@@ -580,8 +662,11 @@ const DragonBonesPlayer = forwardRef<DragonBonesHandle, DragonBonesPlayerProps>(
       zipUrl,
       width = 480,
       height = 270,
+      displayScale = 1,
       armature,
       fitSize = false,
+      fitMode = 'current-frame',
+      showDebugBounds = false,
       forceCanvas = false,
       excludedChildArmatureNames = [],
       autoPlay = true,
@@ -604,6 +689,9 @@ const DragonBonesPlayer = forwardRef<DragonBonesHandle, DragonBonesPlayerProps>(
     const destroyedRef = useRef(false);
     const firstAnimRef = useRef('');
     const fitFrameRef = useRef<number | null>(null);
+    const fitViewportBoundsRef = useRef<DragonBonesBounds | null>(null);
+    const showDebugBoundsRef = useRef(false);
+    const [debugViewportBounds, setDebugViewportBounds] = useState<DragonBonesBounds | null>(null);
     const onCompleteRef = useRef(onComplete);
     const onReadyRef = useRef(onReady);
     const onErrorRef = useRef(onError);
@@ -621,8 +709,26 @@ const DragonBonesPlayer = forwardRef<DragonBonesHandle, DragonBonesPlayerProps>(
       onErrorRef.current = onError;
     }, [onError]);
 
+    useEffect(() => {
+      const wasShown = showDebugBoundsRef.current;
+      showDebugBoundsRef.current = showDebugBounds;
+
+      if (showDebugBounds) {
+        setDebugViewportBounds(fitViewportBoundsRef.current);
+      } else if (wasShown) {
+        setDebugViewportBounds(null);
+      }
+    }, [showDebugBounds]);
+
+    const recordFitBounds = (bounds: DragonBonesBounds | null) => {
+      fitViewportBoundsRef.current = bounds;
+      if (showDebugBoundsRef.current) {
+        setDebugViewportBounds(bounds);
+      }
+    };
+
     const scheduleFit = () => {
-      if (!fitSize) {
+      if (!fitSize || fitMode !== 'current-frame') {
         return;
       }
 
@@ -637,7 +743,10 @@ const DragonBonesPlayer = forwardRef<DragonBonesHandle, DragonBonesPlayerProps>(
           return;
         }
 
-        fitMovieDisplayToViewport(movieRef.current as MovieWithChildArmatures, width, height);
+        recordFitBounds(
+          fitMovieDisplayToViewport(movieRef.current as MovieWithChildArmatures, width, height) ??
+            null,
+        );
       });
     };
 
@@ -647,15 +756,50 @@ const DragonBonesPlayer = forwardRef<DragonBonesHandle, DragonBonesPlayerProps>(
         const app = appRef.current;
         const name = animationName ?? firstAnimRef.current;
         if (!movie || !name) return;
+        if (fitSize && fitMode === 'animation-bounds') {
+          recordFitBounds(
+            fitMovieAnimationToViewport(
+              movie as MovieWithChildArmatures,
+              width,
+              height,
+              name,
+            ) ?? null,
+          );
+        }
         playMovieAnimation(movie as MovieWithChildArmatures, name, loop);
         app?.start();
         scheduleFit();
+      },
+      playArmatureAnimation(armatureName: string, animationName: string, loop = false) {
+        const movie = movieRef.current as MovieWithChildArmatures | null;
+        const shortArmatureName = armatureName.split('/').pop() ?? armatureName;
+        const childArmature = movie?._childArmatureList?.find(
+          (child) =>
+            child.name === armatureName ||
+            child.name === shortArmatureName ||
+            child.name?.endsWith(`/${shortArmatureName}`),
+        );
+        const animation = childArmature?.animation;
+        if (!animation || !animationName) return false;
+        const hasAnimation =
+          typeof animation.hasAnimation === 'function'
+            ? animation.hasAnimation(animationName)
+            : animation.animationNames?.includes(animationName);
+        if (!hasAnimation) return false;
+        const playTimes = loop ? 0 : 1;
+        if (typeof animation.play === 'function') animation.play(animationName, playTimes);
+        else animation.gotoAndPlayByTime?.(animationName, 0, playTimes);
+        appRef.current?.start();
+        return true;
       },
       showFirstFrame(animationName?: string) {
         const movie = movieRef.current as MovieWithChildArmatures | null;
         const app = appRef.current;
         const name = animationName ?? firstAnimRef.current;
         if (!movie || !name) return;
+        if (fitSize && fitMode === 'animation-bounds') {
+          recordFitBounds(fitMovieAnimationToViewport(movie, width, height, name) ?? null);
+        }
         showMovieAnimationFirstFrame(movie, name);
         scheduleFit();
         if (typeof app?.render === 'function') {
@@ -782,6 +926,7 @@ const DragonBonesPlayer = forwardRef<DragonBonesHandle, DragonBonesPlayerProps>(
       if (!container) return;
 
       destroyedRef.current = false;
+      recordFitBounds(null);
 
       PixiSkItem.loadUrl(zipUrl)
         .then((item) => {
@@ -806,6 +951,7 @@ const DragonBonesPlayer = forwardRef<DragonBonesHandle, DragonBonesPlayerProps>(
           app.view.style.display = 'block';
           app.view.style.background = 'transparent';
           app.view.style.border = '0';
+          app.view.style.pointerEvents = 'none';
 
           container.appendChild(app.view);
           appRef.current = app;
@@ -842,6 +988,11 @@ const DragonBonesPlayer = forwardRef<DragonBonesHandle, DragonBonesPlayerProps>(
           }
 
           movieRef.current = movie;
+          setMovieDisplayTransform(movie as MovieWithChildArmatures, {
+            x: 0,
+            y: 0,
+            scale: displayScale,
+          });
           detachMovieChildArmatures(movie as MovieWithChildArmatures, excludedChildArmatureNames);
           firstAnimRef.current = movie.movementList[0] ?? '';
           const initialAnimationName =
@@ -863,15 +1014,29 @@ const DragonBonesPlayer = forwardRef<DragonBonesHandle, DragonBonesPlayerProps>(
           });
 
           if (autoPlay && firstAnimRef.current) {
-            movie.curtMovement = firstAnimRef.current;
-            movie.play(0); // 0 = 无限循环
-            syncMovieChildArmatureAnimations(
-              movie as MovieWithChildArmatures,
-              firstAnimRef.current,
-              true,
-            );
+            if (fitSize && fitMode === 'animation-bounds') {
+              recordFitBounds(
+                fitMovieAnimationToViewport(
+                  movie as MovieWithChildArmatures,
+                  width,
+                  height,
+                  firstAnimRef.current,
+                ) ?? null,
+              );
+            }
+            playMovieAnimation(movie as MovieWithChildArmatures, firstAnimRef.current, true);
             app.start();
           } else if (initialAnimationName) {
+            if (fitSize && fitMode === 'animation-bounds') {
+              recordFitBounds(
+                fitMovieAnimationToViewport(
+                  movie as MovieWithChildArmatures,
+                  width,
+                  height,
+                  initialAnimationName,
+                ) ?? null,
+              );
+            }
             gotoMovieFrame(movie as MovieWithChildArmatures, initialAnimationName, 0);
             renderDragonBonesStage(app);
           } else {
@@ -916,9 +1081,61 @@ const DragonBonesPlayer = forwardRef<DragonBonesHandle, DragonBonesPlayerProps>(
       transparent,
       transparentMode,
       fitSize,
+      fitMode,
+      displayScale,
     ]);
 
-    return <div ref={containerRef} className={className} style={{ width, height, ...style }} />;
+    return (
+      <div
+        ref={containerRef}
+        className={className}
+        style={{ width, height, ...(showDebugBounds ? { position: 'relative' } : {}), ...style }}
+      >
+        {showDebugBounds && debugViewportBounds && (
+          <svg
+            aria-hidden="true"
+            width={width}
+            height={height}
+            viewBox={`0 0 ${width} ${height}`}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              zIndex: 1,
+              width: '100%',
+              height: 'auto',
+              pointerEvents: 'none',
+            }}
+          >
+            <line
+              x1={width / 2}
+              y1={0}
+              x2={width / 2}
+              y2={height}
+              stroke="#ec3f8c"
+              strokeDasharray="4 4"
+            />
+            <line
+              x1={0}
+              y1={height / 2}
+              x2={width}
+              y2={height / 2}
+              stroke="#ec3f8c"
+              strokeDasharray="4 4"
+            />
+            <rect
+              x={debugViewportBounds.x}
+              y={debugViewportBounds.y}
+              width={debugViewportBounds.width}
+              height={debugViewportBounds.height}
+              fill="none"
+              stroke="#00aeca"
+              strokeWidth={2}
+            />
+          </svg>
+        )}
+      </div>
+    );
   },
 );
 
