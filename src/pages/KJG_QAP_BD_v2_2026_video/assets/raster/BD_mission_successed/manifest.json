@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "asset": "BD_mission_successed",
+  "fps": 24,
+  "canvas": {
+    "width": 364,
+    "height": 230
+  },
+  "anchor": {
+    "x": -2,
+    "y": -2
+  },
+  "actions": {
+    "start": {
+      "frameCount": 10,
+      "duration": 0.4166666666666667,
+      "loop": true,
+      "webm": "start.webm",
+      "mov": "start.mov",
+      "atlases": [
+        {
+          "src": "start-atlas-01.png",
+          "columns": 5,
+          "rows": 2,
+          "startFrame": 0,
+          "frameCount": 10
+        }
+      ]
+    },
+    "end": {
+      "frameCount": 1,
+      "duration": 0.041666666666666664,
+      "loop": false,
+      "still": "end.png"
+    }
+  }
+}

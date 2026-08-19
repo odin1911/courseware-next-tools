@@ -88,4 +88,12 @@ describe('animations page', () => {
     expect(container.textContent).toContain('没有找到 missing.zip');
     expect(container.querySelector('a[href="./"]')?.textContent).toContain('返回动画列表');
   });
+
+  it('export 参数打开无交互的透明逐帧导出页', () => {
+    window.history.replaceState({}, '', '/animations/?export=BD_laki.zip');
+    renderApp();
+
+    expect(container.querySelector('[data-testid="animation-frame-exporter"]')).not.toBeNull();
+    expect(container.querySelector('a[href="?asset=BD_laki.zip"]')).toBeNull();
+  });
 });

@@ -8,7 +8,7 @@
 ## 范围与不做
 - 范围：`src/pages/animations/assets` 的 15 个现有包及 `KJG_QAP_BD_v2_2026` 对同名模板动画的调用。
 - 范围：AI 素材规范、抠像/透明母版、视频编码、图集打包、播放器和模板迁移。
-- 范围：无 AI 样例期间，以现动画播放录屏作为一次性管线验证输入。
+- 范围：无 AI 样例期间，以现动画透明 Canvas 逐帧导出作为一次性管线验证输入。
 - 不改题目下发的动态 `skeletonUrl`；它是另一条题目资源链。
 - 不把角色行走、门帘横移、金币飞行等 CSS 运动烘焙进素材。
 - 不引入 Lottie、Rive、Spine 等新的动画制作/runtime 体系。
@@ -23,8 +23,8 @@
 - APNG 支持透明动画且覆盖 Safari 8，但 `<img>` 没有标准 pause、seek、currentTime、ended 控制。
 - Animated WebP 需要 Safari 14+，不能覆盖 iOS 12；Animated AVIF 的动画支持下限更高。
 - Canvas 2D `drawImage()` 与 `requestAnimationFrame()` 可覆盖 iOS 12，并能实现精确帧控制。
-- 当前模板引用的部分共享模块在工作树中缺失，`yarn typecheck` 仍被此现状阻塞。
-- 正式流程假设 AI 输出带 alpha，导入时仍需抽帧验证 alpha；普通屏幕录制不保留 alpha，临时录屏必须使用纯色背景并抠像，只验证管线而不代表最终透明边缘质量。
+- 模板所需共享模块已从原项目按静态依赖闭包恢复，`yarn typecheck`、测试和构建均已通过基线验证。
+- 正式流程假设 AI 输出带 alpha，导入时仍需抽帧验证 alpha；临时 DragonBones 透明帧只验证生产与播放管线，不代表最终 AI 边缘质量。
 
 ## AI 动画统一生产母版
 1. 正式输入为 AI 生成的带 alpha 视频；迁移验证期录制现有动画播放，抠像后转为 RGBA PNG 帧。迁移完成后不再需要 DragonBones。
@@ -134,7 +134,7 @@
 - 基线 B 的主要风险是下载体积和解码内存；`BD_ola/wait` 单动作原始 RGBA 约 13.3 MB，应按动作加载并允许拆图集。
 - 三份格式会增加构建产物/CDN 存储体积；视频优势依赖按设备按需请求，Service Worker 或预缓存清单不得提前下载全部变体。
 - APNG/WebP/AVIF 即使格式支持透明，也无法直接提供本模板需要的媒体控制契约。
-- 当前模板共享源码缺失仍阻塞完整 typecheck；修复工作树完整性是实现前置条件。
+- 共享源码完整性前置已完成；后续仍需保持复制文件与原项目版本一致。
 
 ## 网络依据
 - [W3C PNG 3：APNG 与 alpha](https://www.w3.org/TR/png-3/)

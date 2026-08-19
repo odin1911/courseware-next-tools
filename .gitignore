@@ -5,3 +5,6 @@ test-results/
 playwright-report/
 *.tsbuildinfo
 .DS_Store
+findings.md
+task_plan.md
+progress.md

@@ -9,7 +9,7 @@
 - 不修改、重命名或格式化 `src/pages/KJG_QAP_BD_v2_2026` 中任何文件；执行前后用文件摘要比对。
 - 新模板名暂定 `KJG_QAP_BD_v2_2026_video`；Vite 会根据新目录的 `index.html` 自动发现入口。
 - 其余角色、失败结果和特效继续使用样板当前 DragonBones 路径，本轮不删除仓库级 DragonBones/Pixi 依赖。
-- 不提交原始录屏、抠像中间帧或缓存；只提交三种浏览器交付资源、manifest、播放器和测试。
+- 不提交临时 RGBA 母版帧或缓存；只提交三种浏览器交付资源、manifest、播放器和测试。
 - 不修改题目数据接口、CSS 场景位移、音频和状态机，也不执行 commit、push、分支或 PR 操作。
 - `/Users/limin/work/courseware-next-frontend` 只作为只读来源；只复制新模板编译/运行实际可达的共享依赖，不整目录同步。
 
@@ -20,8 +20,8 @@
 - 样板运行时从 `assets/skeleton` 引用 laki 和成功动画；`count.zip` 仅见于 `assets/animations`，实际入口是当前缺失的共享 `countdown-overlay`。
 - `MaluCharacter` 负责角色内部动画，外层 CSS 负责横移与暂停；成功动画入口是 `ResultOverlay`，倒计时入口是 `MainFlowOverlayLayer`。
 - 执行前 `yarn typecheck` 因共享源码缺失而失败；现已从原项目恢复90个白名单文件并通过 typecheck、全仓测试、构建和样板浏览器主流程验证。
-- 共享闭包额外依赖 `howler ^2.2.4`、`styled-components 6.4.2`、`@types/howler ^2.2.12`；当前工具仓库尚未安装。
-- 临时素材以现动画纯色背景录屏代替 AI alpha 视频，抠像后形成 RGBA PNG 母版；它只验证管线，不作为最终边缘画质标准。
+- 共享闭包额外依赖 `howler ^2.2.4`、`styled-components 6.4.2`、`@types/howler ^2.2.12`；已按原项目版本安装。
+- 临时素材从现动画透明 Canvas 逐帧导出 RGBA PNG 母版，避免绿幕抠像损失；它只验证管线，不作为最终 AI 边缘画质标准。
 
 ## 修改点
 1. 恢复最小共享依赖（已完成）
@@ -34,8 +34,8 @@
    - `src/pages/KJG_QAP_BD_v2_2026_video/`（新增）：复制样板源码、声音、纹理及仍在使用的 skeleton；不复制重复的 `assets/animations`，也不复制 laki/成功动画 zip。
    - `index.html`、`App.tsx`、现有测试副本：只更新新模板标识和断言，业务行为保持一致。
 3. 临时素材与构建工具
-   - `tools/ai-animation/README.md`（新增）：规定纯色录屏、抠像、24 fps、统一画布/锚点、alpha 检查、临时目录与产物命名。
-   - `tools/ai-animation/build-animation-assets.sh`（新增）：接受 RGBA 帧目录，一次生成 WebM、MOV、分页面 PNG 图集和静态末帧；复用本机 FFmpeg，不增加依赖。
+   - `tools/ai-animation/README.md`（新增）：规定 AI alpha 视频、24 fps、统一画布/锚点、alpha 检查、临时目录与产物命名。
+   - `tools/ai-animation/build-animation-assets.sh`（新增）：接受 AI alpha 视频或 RGBA 帧目录，一次生成 WebM、MOV、2048px 分页 PNG 图集和静态末帧；复用本机 FFmpeg，不增加依赖。
    - `tools/ai-animation/build-animation-manifest.mjs`（新增）：生成 `fps/canvas/anchor/actions`；动作记录 `frameCount/duration/loop/webm/mov/atlases/still`，并拒绝帧数或画布不一致。
    - `src/pages/KJG_QAP_BD_v2_2026_video/assets/raster/{BD_laki,BD_mission_successed,count}/`（新增）：存放三组最终资源与 manifest。
 4. 新模板内最小播放器
@@ -77,7 +77,7 @@
 
 ## 风险与兼容性
 - 共享依赖闭包较大，漏掉 `new URL` 资源会在运行时才暴露；执行时先恢复、typecheck、打开未改样板，再开始新模板视频改造。
-- 纯色录屏抠像会损伤半透明边缘；正式 AI alpha 样例到位后必须重新生成，不沿用临时媒体做正式验收。
+- 当前透明 Canvas 逐帧导出只用于迁移验证；正式 AI alpha 样例到位后必须重新生成并重新验收边缘质量。
 - `canPlayType` 不能证明 alpha 正确；Chrome/Android 与 Safari 必须用棋盘格真机目测，iOS 12固定走 Canvas。
 - PNG 图集解码内存高，必须按当前动作懒加载和释放；三种产物不得全部进入 Service Worker 预缓存。
 - HEVC alpha 依赖 macOS VideoToolbox 编码和 iOS 13+/Safari 13+；编码失败不得用普通无 alpha HEVC 冒充。

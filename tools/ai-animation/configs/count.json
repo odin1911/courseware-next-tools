@@ -1,0 +1,10 @@
+{
+  "asset": "count",
+  "fps": 24,
+  "canvas": { "width": 677, "height": 378 },
+  "anchor": { "x": 270.77001953125, "y": 159.99926952514647 },
+  "actions": [
+    { "name": "start", "frameCount": 76, "loop": false },
+    { "name": "end", "frameCount": 1, "loop": false }
+  ]
+}
