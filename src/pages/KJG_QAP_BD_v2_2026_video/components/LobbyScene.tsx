@@ -12,14 +12,12 @@ import LobbyStartButton, {
 import LobbySoundControl, {
   type LobbySoundControlLayout,
 } from '@/shared/components/lobby-sound-control';
-import LobbyTitlePlayer from '@/shared/components/lobby-title-player';
 import { createAudioManager } from '@/shared/components/audio-manager/AudioManager';
 import atlasData from '../assets/textures/KJG_QAP_BD_v2.json';
-import { BD_DRAGONBONES_ARMATURE } from '../logic/runtime';
 import { BurgerDinerStageBackgroundImage } from '../stage-backgrounds';
+import RasterLobbyTitle from './RasterLobbyTitle';
 
 const ATLAS_URL = new URL('../assets/textures/KJG_QAP_BD_v2.png', import.meta.url).href;
-const TITLE_ZIP_URL = new URL('../assets/skeleton/BD_title.zip', import.meta.url).href;
 const LOBBY_BGM_URL = new URL('@/shared/assets/audios/game_lobby_bgm.mp3', import.meta.url).href;
 const STAGE_WIDTH = 1024;
 const STAGE_HEIGHT = 768;
@@ -173,9 +171,7 @@ export default function LobbyScene({
             overflow: 'hidden',
           }}
         >
-          <LobbyTitlePlayer
-            zipUrl={TITLE_ZIP_URL}
-            armature={BD_DRAGONBONES_ARMATURE}
+          <RasterLobbyTitle
             width={STAGE_WIDTH}
             height={STAGE_HEIGHT}
             floatAnimation={TITLE_FLOAT_ANIMATION}

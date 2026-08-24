@@ -1,11 +1,8 @@
-import { useRef } from 'react';
-import DragonBonesPlayer from '@/shared/components/dragonbones-player';
-import type { DragonBonesHandle } from '@/shared/components/dragonbones-player';
-import { BD_DRAGONBONES_ARMATURE, resolveAnimationName } from '../../logic/runtime';
-import { fitPlayerToViewport } from './mainSceneGeometry';
+import { getRasterAsset } from '../../rasterAssets';
+import RasterAnimationPlayer from '../raster-animation/RasterAnimationPlayer';
 import type { PayMoneyState } from './mainSceneTypes';
 
-const PAY_MONEY_ZIP_URL = new URL('../../assets/skeleton/BD_pay_money.zip', import.meta.url).href;
+const PAY_MONEY_ASSET = getRasterAsset('BD_pay_money');
 
 export const PAY_MONEY_START_OFFSET_X = 30;
 export const PAY_MONEY_START_Y = 212;
@@ -21,7 +18,11 @@ const PAY_MONEY_CANVAS_WIDTH = PAY_MONEY_WIDTH + PAY_MONEY_CANVAS_PADDING * 2;
 const PAY_MONEY_CANVAS_HEIGHT = PAY_MONEY_HEIGHT + PAY_MONEY_CANVAS_PADDING * 2;
 
 export default function PayMoneyEffect({ state }: { state: PayMoneyState }) {
-  const playerRef = useRef<DragonBonesHandle | null>(null);
+  const fitScale = Math.min(
+    PAY_MONEY_CANVAS_WIDTH / PAY_MONEY_ASSET.manifest.canvas.width,
+    PAY_MONEY_CANVAS_HEIGHT / PAY_MONEY_ASSET.manifest.canvas.height,
+    1,
+  );
 
   return (
     <div
@@ -52,29 +53,18 @@ export default function PayMoneyEffect({ state }: { state: PayMoneyState }) {
           overflow: 'visible',
         }}
       >
-        <DragonBonesPlayer
-          ref={playerRef}
-          zipUrl={PAY_MONEY_ZIP_URL}
-          armature={BD_DRAGONBONES_ARMATURE}
-          width={PAY_MONEY_CANVAS_WIDTH}
-          height={PAY_MONEY_CANVAS_HEIGHT}
-          autoPlay={false}
-          onReady={() => {
-            fitPlayerToViewport(
-              playerRef.current,
-              PAY_MONEY_CANVAS_WIDTH,
-              PAY_MONEY_CANVAS_HEIGHT,
-              0,
-            );
-            const animationList = playerRef.current?.getAnimationList() ?? [];
-            const animationName = resolveAnimationName(
-              animationList,
-              ['start'],
-              animationList[0] ?? '',
-            );
-            if (animationName) {
-              playerRef.current?.play(animationName, false);
-            }
+        <RasterAnimationPlayer
+          manifest={PAY_MONEY_ASSET.manifest}
+          files={PAY_MONEY_ASSET.files}
+          action="start"
+          restartKey={state.token}
+          style={{
+            left:
+              (PAY_MONEY_CANVAS_WIDTH - PAY_MONEY_ASSET.manifest.canvas.width * fitScale) / 2,
+            top:
+              (PAY_MONEY_CANVAS_HEIGHT - PAY_MONEY_ASSET.manifest.canvas.height * fitScale) / 2,
+            transform: `scale(${fitScale})`,
+            transformOrigin: 'top left',
           }}
         />
       </div>

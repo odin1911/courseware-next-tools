@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "asset": "BD_close",
+  "fps": 24,
+  "canvas": {
+    "width": 790,
+    "height": 546
+  },
+  "anchor": {
+    "x": -2,
+    "y": -2
+  },
+  "actions": {
+    "start": {
+      "frameCount": 38,
+      "duration": 1.5833333333333333,
+      "loop": false,
+      "webm": "start.webm",
+      "mov": "start.mov",
+      "atlases": [
+        {
+          "src": "start-atlas-01.png",
+          "columns": 2,
+          "rows": 3,
+          "startFrame": 0,
+          "frameCount": 6
+        },
+        {
+          "src": "start-atlas-02.png",
+          "columns": 2,
+          "rows": 3,
+          "startFrame": 6,
+          "frameCount": 6
+        },
+        {
+          "src": "start-atlas-03.png",
+          "columns": 2,
+          "rows": 3,
+          "startFrame": 12,
+          "frameCount": 6
+        },
+        {
+          "src": "start-atlas-04.png",
+          "columns": 2,
+          "rows": 3,
+          "startFrame": 18,
+          "frameCount": 6
+        },
+        {
+          "src": "start-atlas-05.png",
+          "columns": 2,
+          "rows": 3,
+          "startFrame": 24,
+          "frameCount": 6
+        },
+        {
+          "src": "start-atlas-06.png",
+          "columns": 2,
+          "rows": 3,
+          "startFrame": 30,
+          "frameCount": 6
+        },
+        {
+          "src": "start-atlas-07.png",
+          "columns": 2,
+          "rows": 1,
+          "startFrame": 36,
+          "frameCount": 2
+        }
+      ]
+    },
+    "end": {
+      "frameCount": 1,
+      "duration": 0.041666666666666664,
+      "loop": false,
+      "still": "end.png"
+    }
+  }
+}

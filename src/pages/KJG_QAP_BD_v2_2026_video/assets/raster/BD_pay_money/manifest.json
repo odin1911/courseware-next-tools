@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "asset": "BD_pay_money",
+  "fps": 24,
+  "canvas": {
+    "width": 74,
+    "height": 82
+  },
+  "anchor": {
+    "x": -2.007135007530451,
+    "y": -24.59390640258789
+  },
+  "actions": {
+    "start": {
+      "frameCount": 15,
+      "duration": 0.625,
+      "loop": false,
+      "webm": "start.webm",
+      "mov": "start.mov",
+      "atlases": [
+        {
+          "src": "start-atlas-01.png",
+          "columns": 27,
+          "rows": 1,
+          "startFrame": 0,
+          "frameCount": 15
+        }
+      ]
+    },
+    "end": {
+      "frameCount": 1,
+      "duration": 0.041666666666666664,
+      "loop": false,
+      "still": "end.png"
+    }
+  }
+}

@@ -5,10 +5,6 @@ const mainSceneSource = readFileSync(
   new URL('./components/MainScene.tsx', import.meta.url),
   'utf8',
 );
-const payMoneyEffectSource = readFileSync(
-  new URL('./components/MainSceneParts/PayMoneyEffect.tsx', import.meta.url),
-  'utf8',
-);
 const stageBackgroundsSource = readFileSync(
   new URL('./stage-backgrounds.tsx', import.meta.url),
   'utf8',
@@ -23,15 +19,6 @@ const hintVisualSource = readFileSync(
 );
 
 describe('KJG_QAP_BD_v2_2026 MainScene', () => {
-  it('金币骨骼应直接在放大的安全区画布里居中', () => {
-    expect(payMoneyEffectSource).toContain('fitPlayerToViewport(');
-    expect(payMoneyEffectSource).toContain('PAY_MONEY_CANVAS_WIDTH');
-    expect(payMoneyEffectSource).toContain('PAY_MONEY_CANVAS_HEIGHT');
-    expect(payMoneyEffectSource).toContain('0,');
-    expect(payMoneyEffectSource).not.toContain('display.x += PAY_MONEY_CANVAS_PADDING;');
-    expect(payMoneyEffectSource).not.toContain('display.y += PAY_MONEY_CANVAS_PADDING;');
-  });
-
   it('主场景上半背景应作为 scene 级中间层挂载，避免被 1024 UI 容器裁切', () => {
     expect(mainSceneSource).toContain('FixedStageContentFrameLayer');
     expect(mainSceneSource).toContain('FixedStageLayer');

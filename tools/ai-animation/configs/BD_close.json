@@ -1,0 +1,24 @@
+{
+  "asset": "BD_close",
+  "fps": 24,
+  "canvas": {
+    "width": 790,
+    "height": 546
+  },
+  "anchor": {
+    "x": -2,
+    "y": -2
+  },
+  "actions": [
+    {
+      "name": "start",
+      "frameCount": 38,
+      "loop": false
+    },
+    {
+      "name": "end",
+      "frameCount": 1,
+      "loop": false
+    }
+  ]
+}

@@ -21,11 +21,13 @@ export function buildExportGeometry(
     width: maxX - minX,
     height: maxY - minY,
   };
+  const canvasWidth = Math.ceil(sourceBounds.width + padding * 2);
+  const canvasHeight = Math.ceil(sourceBounds.height + padding * 2);
 
   return {
     canvas: {
-      width: Math.ceil(sourceBounds.width + padding * 2),
-      height: Math.ceil(sourceBounds.height + padding * 2),
+      width: canvasWidth + (canvasWidth % 2),
+      height: canvasHeight + (canvasHeight % 2),
     },
     anchor: {
       x: origin.x + minX - padding,

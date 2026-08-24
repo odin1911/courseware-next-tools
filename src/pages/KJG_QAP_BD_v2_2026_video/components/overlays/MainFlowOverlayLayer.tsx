@@ -33,8 +33,8 @@ export default function MainFlowOverlayLayer({
       <FixedStageLayer
         data-main-flow-overlay-host="true"
         data-overlay="countdown"
-        data-render-mode="dragonbones"
-        data-asset-source="skeleton"
+        data-render-mode="raster"
+        data-asset-source="video-or-atlas"
         zIndex={10}
         pointerEvents="auto"
       >

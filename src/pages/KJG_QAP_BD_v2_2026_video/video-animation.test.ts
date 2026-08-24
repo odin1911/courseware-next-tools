@@ -1,35 +1,54 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, test } from 'vitest';
-import lakiManifest from './assets/raster/BD_laki/manifest.json';
-import successManifest from './assets/raster/BD_mission_successed/manifest.json';
-import countManifest from './assets/raster/count/manifest.json';
 
 const pageRoot = path.resolve(__dirname);
+const rasterRoot = path.join(pageRoot, 'assets/raster');
+
+type ManifestAction = {
+  webm?: string;
+  mov?: string;
+  still?: string;
+  atlases?: Array<{ src: string }>;
+};
+
+type Manifest = {
+  canvas: { width: number; height: number };
+  actions: Record<string, ManifestAction>;
+};
+
+function loadRasterManifests() {
+  return fs
+    .readdirSync(rasterRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => [
+      entry.name,
+      JSON.parse(fs.readFileSync(path.join(rasterRoot, entry.name, 'manifest.json'), 'utf8')) as Manifest,
+    ] as const);
+}
 
 describe('KJG_QAP_BD_v2_2026 video animation migration', () => {
-  test('publishes ten video actions and three still end frames', () => {
-    const actions = [
-      ...Object.values(lakiManifest.actions),
-      ...Object.values(successManifest.actions),
-      ...Object.values(countManifest.actions),
-    ];
+  test('publishes all fourteen resources and sixty-three actions', () => {
+    const manifests = loadRasterManifests();
+    const actions = manifests.flatMap(([, manifest]) => Object.values(manifest.actions));
 
-    expect(actions.filter((action) => 'webm' in action && 'mov' in action)).toHaveLength(10);
-    expect(actions.filter((action) => 'still' in action)).toHaveLength(3);
+    expect(manifests).toHaveLength(14);
+    expect(actions).toHaveLength(63);
+    expect(actions.filter((action) => action.webm && action.mov)).toHaveLength(49);
+    expect(actions.filter((action) => action.still)).toHaveLength(14);
+    for (const [, manifest] of manifests) {
+      expect(manifest.canvas.width % 2).toBe(0);
+      expect(manifest.canvas.height % 2).toBe(0);
+    }
   });
 
   test('every manifest reference exists in the raster asset directory', () => {
-    for (const [asset, manifest] of [
-      ['BD_laki', lakiManifest],
-      ['BD_mission_successed', successManifest],
-      ['count', countManifest],
-    ] as const) {
+    for (const [asset, manifest] of loadRasterManifests()) {
       const files = Object.values(manifest.actions).flatMap((action) => [
-        ...('webm' in action ? [action.webm] : []),
-        ...('mov' in action ? [action.mov] : []),
-        ...('still' in action ? [action.still] : []),
-        ...('atlases' in action ? action.atlases.map((atlas) => atlas.src) : []),
+        ...(action.webm ? [action.webm] : []),
+        ...(action.mov ? [action.mov] : []),
+        ...(action.still ? [action.still] : []),
+        ...(action.atlases?.map((atlas) => atlas.src) ?? []),
       ]);
 
       for (const file of files) {
@@ -38,23 +57,23 @@ describe('KJG_QAP_BD_v2_2026 video animation migration', () => {
     }
   });
 
-  test('three business entry points no longer reference their target DragonBones zip', () => {
-    const malu = fs.readFileSync(
-      path.join(pageRoot, 'components/MainSceneParts/MaluCharacter.tsx'),
-      'utf8',
-    );
-    const result = fs.readFileSync(
-      path.join(pageRoot, 'components/overlays/ResultOverlay.tsx'),
-      'utf8',
-    );
-    const flow = fs.readFileSync(
-      path.join(pageRoot, 'components/overlays/MainFlowOverlayLayer.tsx'),
-      'utf8',
-    );
+  test('the video template has no local DragonBones resource path', () => {
+    const sourceFiles = fs
+      .readdirSync(path.join(pageRoot, 'components'), { recursive: true, encoding: 'utf8' })
+      .filter(
+        (name) =>
+          typeof name === 'string' &&
+          (name.endsWith('.ts') || name.endsWith('.tsx')) &&
+          !name.includes('.test.'),
+      );
+    const source = sourceFiles
+      .map((name) => fs.readFileSync(path.join(pageRoot, 'components', name), 'utf8'))
+      .join('\n');
+    const skeletonDir = path.join(pageRoot, 'assets/skeleton');
 
-    expect(malu).not.toContain('BD_laki.zip');
-    expect(result).not.toContain('BD_mission_successed.zip');
-    expect(flow).not.toContain("@/shared/components/countdown-overlay");
-    expect(`${malu}\n${result}\n${flow}`).toContain('RasterAnimationPlayer');
+    expect(source).not.toContain('@/shared/components/dragonbones-player');
+    expect(source).not.toContain('assets/skeleton/');
+    expect(source).not.toContain('data-render-mode="dragonbones"');
+    expect(fs.existsSync(skeletonDir) ? fs.readdirSync(skeletonDir) : []).toEqual([]);
   });
 });

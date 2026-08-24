@@ -63,22 +63,3 @@ export type MergeMotionState = {
   active: boolean;
   pendingStart: boolean;
 };
-
-export type PixiDisplayLike = {
-  x: number;
-  y: number;
-  width?: number;
-  height?: number;
-  getLocalBounds?: () => { x: number; y: number; width: number; height: number };
-  getBounds?: () => { x: number; y: number; width: number; height: number };
-  scale?: {
-    set?: (x: number, y?: number) => void;
-  };
-};
-
-export type ChildArmatureLike = {
-  getSlots?: () => Array<{
-    display?: PixiDisplayLike | null;
-    childArmature?: ChildArmatureLike | null;
-  }>;
-};

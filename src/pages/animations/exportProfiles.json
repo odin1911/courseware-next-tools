@@ -1,0 +1,16 @@
+{
+  "BD_close.zip": { "origin": { "x": 0, "y": 0 }, "loopActions": [] },
+  "BD_flash.zip": { "origin": { "x": 0, "y": 0 }, "loopActions": ["start"] },
+  "BD_laki.zip": { "origin": { "x": 0, "y": 245 }, "loopActions": ["enter", "wait"] },
+  "BD_lele.zip": { "origin": { "x": 0, "y": 245 }, "loopActions": ["enter", "wait"] },
+  "BD_mission_failed.zip": { "origin": { "x": 0, "y": 0 }, "loopActions": ["start"] },
+  "BD_mission_successed.zip": { "origin": { "x": 0, "y": 0 }, "loopActions": ["start"] },
+  "BD_nani.zip": { "origin": { "x": 0, "y": 238 }, "loopActions": ["enter", "wait"] },
+  "BD_ola.zip": { "origin": { "x": 0, "y": 244 }, "loopActions": ["enter", "wait"] },
+  "BD_open.zip": { "origin": { "x": 0, "y": 0 }, "loopActions": [] },
+  "BD_pay_money.zip": { "origin": { "x": 0, "y": 0 }, "loopActions": [] },
+  "BD_pili.zip": { "origin": { "x": 0, "y": 245 }, "loopActions": ["enter", "wait"] },
+  "BD_title.zip": { "origin": { "x": 0, "y": 0 }, "loopActions": [] },
+  "count.zip": { "origin": { "x": 316, "y": 162 }, "loopActions": [] },
+  "heart.zip": { "origin": { "x": 512, "y": 384 }, "loopActions": [] }
+}

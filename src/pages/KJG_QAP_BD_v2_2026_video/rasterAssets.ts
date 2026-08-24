@@ -1,7 +1,9 @@
 import type { RasterManifest } from './components/raster-animation/rasterPlayback';
-import lakiManifestJson from './assets/raster/BD_laki/manifest.json';
-import successManifestJson from './assets/raster/BD_mission_successed/manifest.json';
-import countManifestJson from './assets/raster/count/manifest.json';
+
+const manifestModules = import.meta.glob('./assets/raster/*/manifest.json', {
+  eager: true,
+  import: 'default',
+}) as Record<string, RasterManifest>;
 
 const mediaModules = import.meta.glob('./assets/raster/**/*.{webm,mov,png}', {
   eager: true,
@@ -19,17 +21,21 @@ function filesFor(asset: string) {
   );
 }
 
-export const lakiRasterAsset = {
-  manifest: lakiManifestJson as RasterManifest,
-  files: filesFor('BD_laki'),
-};
+export function getRasterAsset(asset: string) {
+  const manifest = manifestModules[`./assets/raster/${asset}/manifest.json`];
+  if (!manifest) throw new Error(`unknown raster asset: ${asset}`);
 
-export const successRasterAsset = {
-  manifest: successManifestJson as RasterManifest,
-  files: filesFor('BD_mission_successed'),
-};
+  return { manifest, files: filesFor(asset) };
+}
 
-export const countRasterAsset = {
-  manifest: countManifestJson as RasterManifest,
-  files: filesFor('count'),
-};
+export function getRasterAssetNames() {
+  return Object.values(manifestModules)
+    .map((manifest) => manifest.asset)
+    .sort();
+}
+
+export const lakiRasterAsset = getRasterAsset('BD_laki');
+
+export const successRasterAsset = getRasterAsset('BD_mission_successed');
+
+export const countRasterAsset = getRasterAsset('count');

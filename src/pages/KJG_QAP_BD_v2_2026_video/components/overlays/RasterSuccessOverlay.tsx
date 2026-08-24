@@ -3,7 +3,7 @@ import AtlasSprite from '@/shared/components/atlas-sprite';
 import { createAudioManager } from '@/shared/components/audio-manager';
 import commonGameAtlas from '@/shared/assets/common/commonGame.json';
 import { getTextureAtlasFrame } from '@/shared/core/atlas';
-import { successRasterAsset } from '../../rasterAssets';
+import { getRasterAsset } from '../../rasterAssets';
 import RasterAnimationPlayer from '../raster-animation/RasterAnimationPlayer';
 
 const COMMON_GAME_ATLAS_URL = new URL(
@@ -18,21 +18,44 @@ const SUCCESS_AUDIO_URL = new URL(
   '../../../../shared/assets/audios/game_over_success.mp3',
   import.meta.url,
 ).href;
+const FAIL_AUDIO_URL = new URL(
+  '../../../../shared/assets/audios/game_over_fail.mp3',
+  import.meta.url,
+).href;
+const RESULT_ASSETS = {
+  success: getRasterAsset('BD_mission_successed'),
+  fail: getRasterAsset('BD_mission_failed'),
+};
 
-export default function RasterSuccessOverlay({ onConfirm }: { onConfirm(): void }) {
+export default function RasterSuccessOverlay({
+  result = 'success',
+  onConfirm,
+}: {
+  result?: 'success' | 'fail';
+  onConfirm(): void;
+}) {
   const audioManagerRef = useRef(createAudioManager());
+  const isSuccess = result === 'success';
+  const rasterAsset = RESULT_ASSETS[result];
   const resultBadgeFrame = getTextureAtlasFrame(commonGameAtlas, 'gameCommon_label_bg');
-  const resultLabelFrame = getTextureAtlasFrame(commonGameAtlas, 'label0001');
+  const labelFrameName = isSuccess ? 'label0001' : 'label0002';
+  const resultLabelFrame = getTextureAtlasFrame(commonGameAtlas, labelFrameName);
   const resultLabelLeft = (resultBadgeFrame.width - resultLabelFrame.width) / 2;
 
   useEffect(() => {
     const audioManager = audioManagerRef.current;
-    audioManager.play({ src: SUCCESS_AUDIO_URL, loop: false, volume: 1 });
+    audioManager.play({
+      src: isSuccess ? SUCCESS_AUDIO_URL : FAIL_AUDIO_URL,
+      loop: false,
+      volume: 1,
+    });
 
     return () => {
-      audioManager.destroy();
+      audioManager.stop();
     };
-  }, []);
+  }, [isSuccess]);
+
+  useEffect(() => () => audioManagerRef.current.destroy(), []);
 
   return (
     <div
@@ -70,16 +93,17 @@ export default function RasterSuccessOverlay({ onConfirm }: { onConfirm(): void 
           <AtlasSprite
             atlasUrl={COMMON_GAME_ATLAS_URL}
             atlasData={commonGameAtlas}
-            frameName="label0001"
-            style={{ position: 'absolute', left: resultLabelLeft, top: 15.5 }}
+            frameName={labelFrameName}
+            style={{ position: 'absolute', left: resultLabelLeft, top: isSuccess ? 15.5 : 16.5 }}
           />
         </div>
         <div
           style={{ position: 'absolute', left: 93, top: 80, width: 360, height: 224.5 }}
         >
           <RasterAnimationPlayer
-            manifest={successRasterAsset.manifest}
-            files={successRasterAsset.files}
+            key={result}
+            manifest={rasterAsset.manifest}
+            files={rasterAsset.files}
             action="start"
           />
         </div>

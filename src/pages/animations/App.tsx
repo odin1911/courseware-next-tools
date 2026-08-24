@@ -5,6 +5,7 @@ import { DEFAULT_ARMATURE } from '../dragonbones-tool/armatureSelection';
 import { buildAnimationCatalog, resolveSelectedAnimation } from './animationCatalog';
 import type { AnimationAsset } from './animationCatalog';
 import AnimationFrameExporter from './AnimationFrameExporter';
+import exportProfiles from './exportProfiles.json';
 import './App.css';
 
 const animationModules = import.meta.glob('./assets/*.zip', {
@@ -15,11 +16,10 @@ const animationModules = import.meta.glob('./assets/*.zip', {
 
 const animationAssets = buildAnimationCatalog(animationModules);
 
-const EXPORT_ORIGINS: Record<string, { x: number; y: number }> = {
-  'BD_laki.zip': { x: 0, y: 245 },
-  'BD_mission_successed.zip': { x: 0, y: 0 },
-  'count.zip': { x: 316, y: 162 },
-};
+const EXPORT_PROFILES = exportProfiles as Record<
+  string,
+  { origin: { x: number; y: number }; loopActions: string[] }
+>;
 
 function LivePreview({ asset, showDebugBounds }: { asset: AnimationAsset; showDebugBounds: boolean }) {
   const [error, setError] = useState('');
@@ -237,7 +237,7 @@ export default function App() {
     return (
       <AnimationFrameExporter
         asset={exportAsset}
-        origin={EXPORT_ORIGINS[exportAsset.fileName] ?? { x: 0, y: 0 }}
+        origin={EXPORT_PROFILES[exportAsset.fileName].origin}
       />
     );
   }

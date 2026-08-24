@@ -39,7 +39,7 @@ describe('video animation debug page', () => {
     await renderApp(ua);
 
     const videos = [...container.querySelectorAll('video')];
-    expect(videos).toHaveLength(10);
+    expect(videos).toHaveLength(49);
     for (const video of videos) {
       const sources = [...video.querySelectorAll('source')];
       expect(sources).toHaveLength(2);

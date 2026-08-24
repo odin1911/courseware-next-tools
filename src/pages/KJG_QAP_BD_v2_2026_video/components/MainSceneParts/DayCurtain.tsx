@@ -1,55 +1,24 @@
-import { useEffect, useRef, useState } from 'react';
-import DragonBonesPlayer from '@/shared/components/dragonbones-player';
-import type { DragonBonesHandle } from '@/shared/components/dragonbones-player';
-import { resolveAnimationName, BD_DRAGONBONES_ARMATURE } from '../../logic/runtime';
+import { useEffect, useState } from 'react';
+import { getRasterAsset } from '../../rasterAssets';
+import RasterAnimationPlayer from '../raster-animation/RasterAnimationPlayer';
 
-const OPEN_ZIP_URL = new URL('../../assets/skeleton/BD_open.zip', import.meta.url).href;
-const CLOSE_ZIP_URL = new URL('../../assets/skeleton/BD_close.zip', import.meta.url).href;
+const OPEN_ASSET = getRasterAsset('BD_open');
+const CLOSE_ASSET = getRasterAsset('BD_close');
 const CURTAIN_VIEWPORT_WIDTH = 414;
 const CURTAIN_VIEWPORT_HEIGHT = 354;
-const CURTAIN_CANVAS_PADDING_RIGHT = 371;
-const CURTAIN_CANVAS_PADDING_BOTTOM = 188;
-const CURTAIN_CANVAS_WIDTH = CURTAIN_VIEWPORT_WIDTH + CURTAIN_CANVAS_PADDING_RIGHT;
-const CURTAIN_CANVAS_HEIGHT = CURTAIN_VIEWPORT_HEIGHT + CURTAIN_CANVAS_PADDING_BOTTOM;
-const CURTAIN_ENTER_ANIMATION = 'start';
-const CURTAIN_HOLD_ANIMATION = 'end';
-
-function resolveCurtainAnimation(animationList: string[], phase: 'entering' | 'hold') {
-  return resolveAnimationName(animationList, [
-    phase === 'entering' ? CURTAIN_ENTER_ANIMATION : CURTAIN_HOLD_ANIMATION,
-  ]);
-}
 
 export interface DayCurtainProps {
   phase: 'opening' | 'closing';
 }
 
 export default function DayCurtain({ phase }: DayCurtainProps) {
-  const playerRef = useRef<DragonBonesHandle | null>(null);
-  const [isReady, setIsReady] = useState(false);
   const [motionPhase, setMotionPhase] = useState<'ready' | 'entering' | 'hold' | 'exiting'>(
     'ready',
   );
+  const rasterAsset = phase === 'opening' ? OPEN_ASSET : CLOSE_ASSET;
+  const rasterAction = motionPhase === 'ready' || motionPhase === 'entering' ? 'start' : 'end';
 
   useEffect(() => {
-    if (!isReady || !playerRef.current) {
-      return;
-    }
-
-    if (motionPhase !== 'entering' && motionPhase !== 'hold') {
-      return;
-    }
-
-    const animationList = playerRef.current.getAnimationList();
-    const animationName = resolveCurtainAnimation(animationList, motionPhase);
-
-    if (animationName) {
-      playerRef.current.play(animationName, false);
-    }
-  }, [isReady, motionPhase]);
-
-  useEffect(() => {
-    setIsReady(false);
     setMotionPhase('ready');
     const enterFrame = window.requestAnimationFrame(() => {
       setMotionPhase('entering');
@@ -74,8 +43,8 @@ export default function DayCurtain({ phase }: DayCurtainProps) {
       data-animation={
         motionPhase === 'hold' ? 'hold' : motionPhase === 'exiting' ? 'exit' : 'enter'
       }
-      data-render-mode="dragonbones"
-      data-asset-source="skeleton"
+      data-render-mode="raster"
+      data-asset-source="video-or-atlas"
       style={{ position: 'absolute', left: 0, top: 0, width: 1024, height: 768 }}
     >
       <div
@@ -100,15 +69,15 @@ export default function DayCurtain({ phase }: DayCurtainProps) {
               : 'none',
         }}
       >
-        <DragonBonesPlayer
-          ref={playerRef}
-          zipUrl={phase === 'opening' ? OPEN_ZIP_URL : CLOSE_ZIP_URL}
-          armature={BD_DRAGONBONES_ARMATURE}
-          width={CURTAIN_CANVAS_WIDTH}
-          height={CURTAIN_CANVAS_HEIGHT}
-          autoPlay={false}
-          onReady={() => setIsReady(true)}
-          style={{ position: 'absolute', left: '-70%', top: '-30%' }}
+        <RasterAnimationPlayer
+          manifest={rasterAsset.manifest}
+          files={rasterAsset.files}
+          action={rasterAction}
+          restartKey={`${phase}:${motionPhase}`}
+          style={{
+            left: rasterAsset.manifest.anchor.x - CURTAIN_VIEWPORT_WIDTH * 0.7,
+            top: rasterAsset.manifest.anchor.y - CURTAIN_VIEWPORT_HEIGHT * 0.3,
+          }}
         />
       </div>
     </div>

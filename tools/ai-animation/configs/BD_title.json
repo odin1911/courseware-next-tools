@@ -1,0 +1,24 @@
+{
+  "asset": "BD_title",
+  "fps": 24,
+  "canvas": {
+    "width": 954,
+    "height": 408
+  },
+  "anchor": {
+    "x": -2,
+    "y": -2
+  },
+  "actions": [
+    {
+      "name": "start",
+      "frameCount": 43,
+      "loop": false
+    },
+    {
+      "name": "end",
+      "frameCount": 1,
+      "loop": false
+    }
+  ]
+}

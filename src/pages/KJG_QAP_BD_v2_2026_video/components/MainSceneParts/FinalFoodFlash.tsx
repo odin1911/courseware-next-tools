@@ -1,30 +1,29 @@
-import { useRef } from 'react';
-import DragonBonesPlayer from '@/shared/components/dragonbones-player';
-import type { DragonBonesHandle } from '@/shared/components/dragonbones-player';
-import { BD_DRAGONBONES_ARMATURE } from '../../logic/runtime';
-import { fitPlayerToViewport } from './mainSceneGeometry';
+import { getRasterAsset } from '../../rasterAssets';
+import RasterAnimationPlayer from '../raster-animation/RasterAnimationPlayer';
 
-const FLASH_ZIP_URL = new URL('../../assets/skeleton/BD_flash.zip', import.meta.url).href;
+const FLASH_ASSET = getRasterAsset('BD_flash');
+const FLASH_VIEWPORT_WIDTH = 562;
+const FLASH_VIEWPORT_HEIGHT = 556;
 
 export default function FinalFoodFlash() {
-  const playerRef = useRef<DragonBonesHandle | null>(null);
+  const fitScale = Math.min(
+    FLASH_VIEWPORT_WIDTH / FLASH_ASSET.manifest.canvas.width,
+    FLASH_VIEWPORT_HEIGHT / FLASH_ASSET.manifest.canvas.height,
+    1,
+  );
 
   return (
-    <DragonBonesPlayer
-      ref={playerRef}
-      zipUrl={FLASH_ZIP_URL}
-      armature={BD_DRAGONBONES_ARMATURE}
-      width={562}
-      height={556}
-      autoPlay
-      transparentMode="premultiplied"
+    <RasterAnimationPlayer
+      manifest={FLASH_ASSET.manifest}
+      files={FLASH_ASSET.files}
+      action="start"
       style={{
-        position: 'absolute',
-        left: -201,
-        top: -238,
-      }}
-      onReady={() => {
-        fitPlayerToViewport(playerRef.current, 562, 556, 0);
+        left:
+          -201 + (FLASH_VIEWPORT_WIDTH - FLASH_ASSET.manifest.canvas.width * fitScale) / 2,
+        top:
+          -238 + (FLASH_VIEWPORT_HEIGHT - FLASH_ASSET.manifest.canvas.height * fitScale) / 2,
+        transform: `scale(${fitScale})`,
+        transformOrigin: 'top left',
       }}
     />
   );

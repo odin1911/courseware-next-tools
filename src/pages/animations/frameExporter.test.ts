@@ -32,4 +32,16 @@ describe('DragonBones frame export geometry', () => {
       'visible frame bounds',
     );
   });
+
+  test('pads odd canvas dimensions so all video formats keep the same size', async () => {
+    const exporter = await loadFrameExporter();
+
+    expect(
+      exporter?.buildExportGeometry(
+        [{ x: 0, y: 0, width: 73, height: 80 }],
+        { x: 0, y: 0 },
+        2,
+      ).canvas,
+    ).toEqual({ width: 78, height: 84 });
+  });
 });

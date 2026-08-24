@@ -275,14 +275,50 @@ export function buildAnimationAssets(configPath, sourceRoot, outputDir) {
   return manifest;
 }
 
+export function buildAnimationAssetBatch(
+  configDir,
+  sourceRoot,
+  outputRoot,
+  buildOne = buildAnimationAssets,
+) {
+  const absoluteOutputRoot = path.resolve(outputRoot);
+  if (fs.existsSync(absoluteOutputRoot)) {
+    throw new Error(`output already exists: ${absoluteOutputRoot}`);
+  }
+
+  const configPaths = fs
+    .readdirSync(configDir)
+    .filter((name) => name.endsWith('.json'))
+    .sort()
+    .map((name) => path.join(configDir, name));
+
+  fs.mkdirSync(path.dirname(absoluteOutputRoot), { recursive: true });
+  const stagingRoot = fs.mkdtempSync(
+    path.join(path.dirname(absoluteOutputRoot), `.${path.basename(absoluteOutputRoot)}-`),
+  );
+
+  try {
+    for (const configPath of configPaths) {
+      const { asset } = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      buildOne(configPath, sourceRoot, path.join(stagingRoot, asset));
+    }
+    fs.renameSync(stagingRoot, absoluteOutputRoot);
+  } catch (error) {
+    fs.rmSync(stagingRoot, { recursive: true, force: true });
+    throw error;
+  }
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [configPath, sourceRoot, outputDir] = process.argv.slice(2);
 
   if (!configPath || !sourceRoot || !outputDir) {
     console.error(
-      'Usage: node build-animation-assets.mjs <config.json> <source-root> <output-dir>',
+      'Usage: node build-animation-assets.mjs <config.json|config-dir> <source-root> <output-dir>',
     );
     process.exitCode = 1;
+  } else if (fs.statSync(configPath).isDirectory()) {
+    buildAnimationAssetBatch(configPath, sourceRoot, outputDir);
   } else {
     buildAnimationAssets(configPath, sourceRoot, outputDir);
   }

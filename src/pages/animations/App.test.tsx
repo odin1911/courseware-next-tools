@@ -60,15 +60,15 @@ describe('animations page', () => {
 
     const toggle = container.querySelector<HTMLInputElement>('input[type="checkbox"]');
     expect(toggle?.checked).toBe(true);
-    expect(container.querySelectorAll('[data-debug-bounds="true"]')).toHaveLength(15);
-    expect(container.querySelectorAll('[data-player-width="100%"]')).toHaveLength(15);
-    expect(container.querySelectorAll('[data-player-height="auto"]')).toHaveLength(15);
-    expect(container.querySelectorAll('[data-fit-mode="animation-bounds"]')).toHaveLength(15);
+    expect(container.querySelectorAll('[data-debug-bounds="true"]')).toHaveLength(14);
+    expect(container.querySelectorAll('[data-player-width="100%"]')).toHaveLength(14);
+    expect(container.querySelectorAll('[data-player-height="auto"]')).toHaveLength(14);
+    expect(container.querySelectorAll('[data-fit-mode="animation-bounds"]')).toHaveLength(14);
 
     act(() => toggle?.click());
 
     expect(toggle?.checked).toBe(false);
-    expect(container.querySelectorAll('[data-debug-bounds="false"]')).toHaveLength(15);
+    expect(container.querySelectorAll('[data-debug-bounds="false"]')).toHaveLength(14);
   });
 
   it('asset 参数打开单个动画详情', () => {

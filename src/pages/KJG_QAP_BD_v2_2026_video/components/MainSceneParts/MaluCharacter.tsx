@@ -1,51 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import DragonBonesPlayer from '@/shared/components/dragonbones-player';
-import type { DragonBonesHandle } from '@/shared/components/dragonbones-player';
-import { lakiRasterAsset } from '../../rasterAssets';
+import { getRasterAsset } from '../../rasterAssets';
 import RasterAnimationPlayer from '../raster-animation/RasterAnimationPlayer';
 import {
   getMaluMoveDuration,
   MALU_ENTRY_START_X,
   resolveMaluAnimation,
-  BD_DRAGONBONES_ARMATURE,
-  shouldLoopMaluAnimation,
 } from '../../logic/runtime';
 
-const ZIP_URLS: Record<string, string> = {
-  ola: new URL('../../assets/skeleton/BD_ola.zip', import.meta.url).href,
-  lele: new URL('../../assets/skeleton/BD_lele.zip', import.meta.url).href,
-  nani: new URL('../../assets/skeleton/BD_nani.zip', import.meta.url).href,
-  pili: new URL('../../assets/skeleton/BD_pili.zip', import.meta.url).href,
+const RASTER_ASSETS = {
+  laki: getRasterAsset('BD_laki'),
+  lele: getRasterAsset('BD_lele'),
+  nani: getRasterAsset('BD_nani'),
+  ola: getRasterAsset('BD_ola'),
+  pili: getRasterAsset('BD_pili'),
 };
 
 const MALU_VIEWPORT_WIDTH = 173;
 const MALU_VIEWPORT_HEIGHT = 474;
-const MALU_CANVAS_PADDING_LEFT = 240;
-const MALU_CANVAS_PADDING_TOP = 120;
-const MALU_CANVAS_PADDING_RIGHT = 240;
-const MALU_CANVAS_PADDING_BOTTOM = 80;
-const MALU_CANVAS_WIDTH =
-  MALU_VIEWPORT_WIDTH + MALU_CANVAS_PADDING_LEFT + MALU_CANVAS_PADDING_RIGHT;
-const MALU_CANVAS_HEIGHT =
-  MALU_VIEWPORT_HEIGHT + MALU_CANVAS_PADDING_TOP + MALU_CANVAS_PADDING_BOTTOM;
-const MALU_SLOT_TOP_BY_CHAR: Record<string, number> = {
-  ola: 244,
-  laki: 245,
-  lele: 245,
-  nani: 238,
-  pili: 245,
-};
-
-function applyDisplayPadding(player: DragonBonesHandle | null, slotTop: number) {
-  const display = player?.getDisplay() as { x?: number; y?: number } | null;
-
-  if (!display) {
-    return;
-  }
-
-  display.x = MALU_CANVAS_PADDING_LEFT;
-  display.y = MALU_CANVAS_PADDING_TOP + slotTop;
-}
 
 export interface MaluCharacterProps {
   charName: string;
@@ -68,11 +39,11 @@ export default function MaluCharacter({
   zIndex = 0,
   onEntered,
 }: MaluCharacterProps) {
-  const playerRef = useRef<DragonBonesHandle | null>(null);
-  const isRasterLaki = charName === 'laki';
   const onEnteredRef = useRef(onEntered);
   const entryDuration = getMaluMoveDuration(startX, posX);
-  const slotTop = MALU_SLOT_TOP_BY_CHAR[charName] ?? 244;
+  const rasterAsset = RASTER_ASSETS[charName as keyof typeof RASTER_ASSETS] ?? RASTER_ASSETS.ola;
+  const rasterAnimationList = Object.keys(rasterAsset.manifest.actions);
+  const rasterAnimation = resolveMaluAnimation(rasterAnimationList, animationName);
   const entryFrameRef = useRef<number | null>(null);
   const entryTimerRef = useRef<number | null>(null);
   const motionRef = useRef({
@@ -85,12 +56,6 @@ export default function MaluCharacter({
   });
   const [left, setLeft] = useState(startX);
   const [transitionMs, setTransitionMs] = useState(0);
-  const [isReady, setIsReady] = useState(false);
-  const [armatureNames, setArmatureNames] = useState<string[]>([]);
-  const [animationList, setAnimationList] = useState<string[]>([]);
-  const rasterAnimationList = Object.keys(lakiRasterAsset.manifest.actions);
-  const effectiveAnimationList = isRasterLaki ? rasterAnimationList : animationList;
-  const rasterAnimation = resolveMaluAnimation(rasterAnimationList, animationName);
 
   useEffect(() => {
     onEnteredRef.current = onEntered;
@@ -223,40 +188,14 @@ export default function MaluCharacter({
     };
   }, [clearEntryHandles, paused, startEntryMotion]);
 
-  useEffect(() => {
-    if (isRasterLaki || !isReady || !playerRef.current) {
-      return;
-    }
-
-    applyDisplayPadding(playerRef.current, slotTop);
-
-    const animations = playerRef.current.getAnimationList();
-    setAnimationList(animations);
-    const resolvedAnimation = resolveMaluAnimation(animations, animationName);
-
-    if (!resolvedAnimation) {
-      return;
-    }
-
-    playerRef.current.play(
-      resolvedAnimation,
-      shouldLoopMaluAnimation(animationName, resolvedAnimation),
-    );
-  }, [animationName, charName, entryKey, isRasterLaki, isReady, slotTop]);
-
-  useEffect(() => {
-    if (!isRasterLaki) playerRef.current?.setPause(paused);
-  }, [isRasterLaki, paused]);
-
   return (
     <div
       data-role="malu"
       data-malu-name={charName}
       data-animation={animationName}
-      data-armatures={armatureNames.join(',')}
-      data-animation-list={effectiveAnimationList.join(',')}
-      data-render-mode={isRasterLaki ? 'raster' : 'dragonbones'}
-      data-asset-source={isRasterLaki ? 'video-or-atlas' : 'skeleton'}
+      data-animation-list={rasterAnimationList.join(',')}
+      data-render-mode="raster"
+      data-asset-source="video-or-atlas"
       style={{
         position: 'absolute',
         left,
@@ -269,35 +208,13 @@ export default function MaluCharacter({
         zIndex,
       }}
     >
-      {isRasterLaki ? (
-        <RasterAnimationPlayer
-          manifest={lakiRasterAsset.manifest}
-          files={lakiRasterAsset.files}
-          action={rasterAnimation}
-          paused={paused}
-          restartKey={`${entryKey}:${animationName}`}
-        />
-      ) : (
-        <DragonBonesPlayer
-          ref={playerRef}
-          zipUrl={ZIP_URLS[charName] ?? ZIP_URLS.ola}
-          armature={BD_DRAGONBONES_ARMATURE}
-          width={MALU_CANVAS_WIDTH}
-          height={MALU_CANVAS_HEIGHT}
-          autoPlay={false}
-          onReady={() => {
-            applyDisplayPadding(playerRef.current, slotTop);
-            setArmatureNames(playerRef.current?.getArmatureNames() ?? []);
-            setAnimationList(playerRef.current?.getAnimationList() ?? []);
-            setIsReady(true);
-          }}
-          style={{
-            position: 'absolute',
-            left: -MALU_CANVAS_PADDING_LEFT,
-            top: -MALU_CANVAS_PADDING_TOP,
-          }}
-        />
-      )}
+      <RasterAnimationPlayer
+        manifest={rasterAsset.manifest}
+        files={rasterAsset.files}
+        action={rasterAnimation}
+        paused={paused}
+        restartKey={`${entryKey}:${animationName}`}
+      />
     </div>
   );
 }

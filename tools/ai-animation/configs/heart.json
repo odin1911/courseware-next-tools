@@ -1,0 +1,24 @@
+{
+  "asset": "heart",
+  "fps": 24,
+  "canvas": {
+    "width": 408,
+    "height": 348
+  },
+  "anchor": {
+    "x": 310.5299987792969,
+    "y": 213.64999389648438
+  },
+  "actions": [
+    {
+      "name": "start",
+      "frameCount": 17,
+      "loop": false
+    },
+    {
+      "name": "end",
+      "frameCount": 1,
+      "loop": false
+    }
+  ]
+}

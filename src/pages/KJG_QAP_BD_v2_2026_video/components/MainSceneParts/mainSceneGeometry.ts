@@ -1,14 +1,8 @@
-import type { DragonBonesHandle } from '@/shared/components/dragonbones-player';
 import type { BDFoodBeltState, BDWordItem } from '../../sceneTypes';
 import { FOOD_THEME_FRAMES, generateCharList, getSelectedLetter } from '../../logic/runtime';
 import { FOOD_ITEM_HEIGHT, FOOD_ITEM_STEP, FOOD_ITEM_WIDTH, FOOD_MASK_LEFT } from './FoodBelt';
 import { FOOD_ROW_MOVE_MS, FOOD_ROW_STAGGER_MS } from './FoodBelts';
-import type {
-  ChildArmatureLike,
-  MergeDisplayPosition,
-  MergeFoodItem,
-  PixiDisplayLike,
-} from './mainSceneTypes';
+import type { MergeDisplayPosition, MergeFoodItem } from './mainSceneTypes';
 
 const FOOD_BELTS_TOP = 223;
 const FOOD_ROW_HEIGHT = 60;
@@ -27,124 +21,6 @@ export function wrapIndex(index: number, total: number) {
 
 export function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
-}
-
-function getDisplayRect(display: PixiDisplayLike | null) {
-  if (!display) {
-    return null;
-  }
-
-  const localBounds = display.getLocalBounds?.();
-
-  if (localBounds && localBounds.width > 0 && localBounds.height > 0) {
-    return {
-      x: display.x + localBounds.x,
-      y: display.y + localBounds.y,
-      width: localBounds.width,
-      height: localBounds.height,
-    };
-  }
-
-  const bounds = display.getBounds?.();
-
-  if (bounds && bounds.width > 0 && bounds.height > 0) {
-    return bounds;
-  }
-
-  if (
-    typeof display.width === 'number' &&
-    display.width > 0 &&
-    typeof display.height === 'number' &&
-    display.height > 0
-  ) {
-    return {
-      x: display.x,
-      y: display.y,
-      width: display.width,
-      height: display.height,
-    };
-  }
-
-  return null;
-}
-
-function mergeDisplayRects(rects: Array<{ x: number; y: number; width: number; height: number }>) {
-  if (rects.length === 0) {
-    return null;
-  }
-
-  let minX = rects[0].x;
-  let minY = rects[0].y;
-  let maxX = rects[0].x + rects[0].width;
-  let maxY = rects[0].y + rects[0].height;
-
-  for (let index = 1; index < rects.length; index += 1) {
-    const rect = rects[index];
-    minX = Math.min(minX, rect.x);
-    minY = Math.min(minY, rect.y);
-    maxX = Math.max(maxX, rect.x + rect.width);
-    maxY = Math.max(maxY, rect.y + rect.height);
-  }
-
-  return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
-}
-
-function collectArmatureDisplayRects(
-  armature: ChildArmatureLike | null,
-  rects: Array<{ x: number; y: number; width: number; height: number }>,
-  seen = new Set<ChildArmatureLike>(),
-) {
-  if (!armature || seen.has(armature)) {
-    return;
-  }
-
-  seen.add(armature);
-
-  for (const slot of armature.getSlots?.() ?? []) {
-    const rect = getDisplayRect(slot.display ?? null);
-
-    if (rect) {
-      rects.push(rect);
-    }
-
-    collectArmatureDisplayRects(slot.childArmature ?? null, rects, seen);
-  }
-}
-
-export function fitPlayerToViewport(
-  player: DragonBonesHandle | null,
-  width: number,
-  height: number,
-  padding = 10,
-) {
-  const display = player?.getDisplay() as PixiDisplayLike | null;
-
-  if (!display) {
-    return;
-  }
-
-  const rects: Array<{ x: number; y: number; width: number; height: number }> = [];
-  const rootRect = getDisplayRect(display);
-
-  if (rootRect) {
-    rects.push(rootRect);
-  }
-
-  collectArmatureDisplayRects(player?.getArmature() as ChildArmatureLike | null, rects);
-
-  const bounds = mergeDisplayRects(rects);
-
-  if (!bounds || bounds.width <= 0 || bounds.height <= 0) {
-    return;
-  }
-
-  const safeWidth = Math.max(width - padding * 2, 1);
-  const safeHeight = Math.max(height - padding * 2, 1);
-  const fitScale = Math.min(safeWidth / bounds.width, safeHeight / bounds.height, 1);
-
-  display.scale?.set?.(fitScale, fitScale);
-  display.x = width / 2 - (bounds.x + bounds.width / 2) * fitScale;
-  display.y = height / 2 - (bounds.y + bounds.height / 2) * fitScale;
 }
 
 export function createBeltStates(wordItem: BDWordItem): BDFoodBeltState[] {

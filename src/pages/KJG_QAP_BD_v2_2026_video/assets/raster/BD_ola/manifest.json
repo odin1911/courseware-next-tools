@@ -1,0 +1,156 @@
+{
+  "version": 1,
+  "asset": "BD_ola",
+  "fps": 24,
+  "canvas": {
+    "width": 178,
+    "height": 204
+  },
+  "anchor": {
+    "x": -108.47000122070312,
+    "y": 53.69
+  },
+  "actions": {
+    "enter": {
+      "frameCount": 18,
+      "duration": 0.75,
+      "loop": true,
+      "webm": "enter.webm",
+      "mov": "enter.mov",
+      "atlases": [
+        {
+          "src": "enter-atlas-01.png",
+          "columns": 11,
+          "rows": 2,
+          "startFrame": 0,
+          "frameCount": 18
+        }
+      ]
+    },
+    "turn_round": {
+      "frameCount": 17,
+      "duration": 0.7083333333333334,
+      "loop": false,
+      "webm": "turn_round.webm",
+      "mov": "turn_round.mov",
+      "atlases": [
+        {
+          "src": "turn_round-atlas-01.png",
+          "columns": 11,
+          "rows": 2,
+          "startFrame": 0,
+          "frameCount": 17
+        }
+      ]
+    },
+    "wait": {
+      "frameCount": 152,
+      "duration": 6.333333333333333,
+      "loop": true,
+      "webm": "wait.webm",
+      "mov": "wait.mov",
+      "atlases": [
+        {
+          "src": "wait-atlas-01.png",
+          "columns": 11,
+          "rows": 10,
+          "startFrame": 0,
+          "frameCount": 110
+        },
+        {
+          "src": "wait-atlas-02.png",
+          "columns": 11,
+          "rows": 4,
+          "startFrame": 110,
+          "frameCount": 42
+        }
+      ]
+    },
+    "angry": {
+      "frameCount": 69,
+      "duration": 2.875,
+      "loop": false,
+      "webm": "angry.webm",
+      "mov": "angry.mov",
+      "atlases": [
+        {
+          "src": "angry-atlas-01.png",
+          "columns": 11,
+          "rows": 7,
+          "startFrame": 0,
+          "frameCount": 69
+        }
+      ]
+    },
+    "happy_eating": {
+      "frameCount": 84,
+      "duration": 3.5,
+      "loop": false,
+      "webm": "happy_eating.webm",
+      "mov": "happy_eating.mov",
+      "atlases": [
+        {
+          "src": "happy_eating-atlas-01.png",
+          "columns": 11,
+          "rows": 8,
+          "startFrame": 0,
+          "frameCount": 84
+        }
+      ]
+    },
+    "sad_eating": {
+      "frameCount": 60,
+      "duration": 2.5,
+      "loop": false,
+      "webm": "sad_eating.webm",
+      "mov": "sad_eating.mov",
+      "atlases": [
+        {
+          "src": "sad_eating-atlas-01.png",
+          "columns": 11,
+          "rows": 6,
+          "startFrame": 0,
+          "frameCount": 60
+        }
+      ]
+    },
+    "pay_1": {
+      "frameCount": 11,
+      "duration": 0.4583333333333333,
+      "loop": false,
+      "webm": "pay_1.webm",
+      "mov": "pay_1.mov",
+      "atlases": [
+        {
+          "src": "pay_1-atlas-01.png",
+          "columns": 11,
+          "rows": 1,
+          "startFrame": 0,
+          "frameCount": 11
+        }
+      ]
+    },
+    "pay_2": {
+      "frameCount": 26,
+      "duration": 1.0833333333333333,
+      "loop": false,
+      "webm": "pay_2.webm",
+      "mov": "pay_2.mov",
+      "atlases": [
+        {
+          "src": "pay_2-atlas-01.png",
+          "columns": 11,
+          "rows": 3,
+          "startFrame": 0,
+          "frameCount": 26
+        }
+      ]
+    },
+    "end": {
+      "frameCount": 1,
+      "duration": 0.041666666666666664,
+      "loop": false,
+      "still": "end.png"
+    }
+  }
+}

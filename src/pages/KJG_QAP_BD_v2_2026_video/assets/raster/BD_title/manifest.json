@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "asset": "BD_title",
+  "fps": 24,
+  "canvas": {
+    "width": 954,
+    "height": 408
+  },
+  "anchor": {
+    "x": -2,
+    "y": -2
+  },
+  "actions": {
+    "start": {
+      "frameCount": 43,
+      "duration": 1.7916666666666667,
+      "loop": false,
+      "webm": "start.webm",
+      "mov": "start.mov",
+      "atlases": [
+        {
+          "src": "start-atlas-01.png",
+          "columns": 2,
+          "rows": 5,
+          "startFrame": 0,
+          "frameCount": 10
+        },
+        {
+          "src": "start-atlas-02.png",
+          "columns": 2,
+          "rows": 5,
+          "startFrame": 10,
+          "frameCount": 10
+        },
+        {
+          "src": "start-atlas-03.png",
+          "columns": 2,
+          "rows": 5,
+          "startFrame": 20,
+          "frameCount": 10
+        },
+        {
+          "src": "start-atlas-04.png",
+          "columns": 2,
+          "rows": 5,
+          "startFrame": 30,
+          "frameCount": 10
+        },
+        {
+          "src": "start-atlas-05.png",
+          "columns": 2,
+          "rows": 2,
+          "startFrame": 40,
+          "frameCount": 3
+        }
+      ]
+    },
+    "end": {
+      "frameCount": 1,
+      "duration": 0.041666666666666664,
+      "loop": false,
+      "still": "end.png"
+    }
+  }
+}

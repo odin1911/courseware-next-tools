@@ -1,4 +1,7 @@
 import { describe, expect, test } from 'vitest';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 
 async function loadAssetBuilder() {
   return import('./build-animation-assets.mjs').catch(() => null);
@@ -61,5 +64,49 @@ describe('animation asset build plan', () => {
         output: '/tmp/output/end.png',
       },
     ]);
+  });
+
+  test('builds every JSON config in filename order', async () => {
+    const builder = await loadAssetBuilder();
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'animation-build-batch-'));
+    const configDir = path.join(root, 'configs');
+    const outputRoot = path.join(root, 'output');
+    fs.mkdirSync(configDir);
+    fs.writeFileSync(path.join(configDir, 'b.json'), '{"asset":"B"}');
+    fs.writeFileSync(path.join(configDir, 'a.json'), '{"asset":"A"}');
+    fs.writeFileSync(path.join(configDir, 'notes.txt'), 'ignored');
+    const calls = [];
+
+    builder?.buildAnimationAssetBatch(configDir, '/frames', outputRoot, (...args) => {
+      calls.push(args);
+    });
+
+    expect(
+      calls.map(([config, source, output]) => [path.basename(config), source, path.basename(output)]),
+    ).toEqual([
+      ['a.json', '/frames', 'A'],
+      ['b.json', '/frames', 'B'],
+    ]);
+    expect(fs.existsSync(outputRoot)).toBe(true);
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+
+  test('removes the whole batch when one resource fails', async () => {
+    const builder = await loadAssetBuilder();
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'animation-build-batch-'));
+    const configDir = path.join(root, 'configs');
+    const outputRoot = path.join(root, 'output');
+    fs.mkdirSync(configDir);
+    fs.writeFileSync(path.join(configDir, 'a.json'), '{"asset":"A"}');
+    fs.writeFileSync(path.join(configDir, 'b.json'), '{"asset":"B"}');
+
+    expect(() =>
+      builder?.buildAnimationAssetBatch(configDir, '/frames', outputRoot, (config, _source, output) => {
+        if (config.endsWith('b.json')) throw new Error('B failed');
+        fs.mkdirSync(output, { recursive: true });
+      }),
+    ).toThrow('B failed');
+    expect(fs.existsSync(outputRoot)).toBe(false);
+    fs.rmSync(root, { recursive: true, force: true });
   });
 });

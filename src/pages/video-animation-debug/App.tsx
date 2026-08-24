@@ -1,9 +1,5 @@
 import { useMemo, useState } from 'react';
-import {
-  countRasterAsset,
-  lakiRasterAsset,
-  successRasterAsset,
-} from '../KJG_QAP_BD_v2_2026_video/rasterAssets';
+import { getRasterAsset, getRasterAssetNames } from '../KJG_QAP_BD_v2_2026_video/rasterAssets';
 
 type VideoFormat = 'webm' | 'mov';
 
@@ -13,12 +9,9 @@ const MIME_TYPES: Record<VideoFormat, string> = {
 };
 const FORMAT_LABELS: Record<VideoFormat, string> = { webm: 'WebM', mov: 'MOV' };
 
-const entries = [
-  { assetName: 'BD_laki', asset: lakiRasterAsset },
-  { assetName: 'BD_mission_successed', asset: successRasterAsset },
-  { assetName: 'count', asset: countRasterAsset },
-].flatMap(({ assetName, asset }) =>
-  Object.entries(asset.manifest.actions).flatMap(([actionName, action]) =>
+const entries = getRasterAssetNames().flatMap((assetName) => {
+  const asset = getRasterAsset(assetName);
+  return Object.entries(asset.manifest.actions).flatMap(([actionName, action]) =>
     action.webm && action.mov
       ? [
           {
@@ -30,8 +23,8 @@ const entries = [
           },
         ]
       : [],
-  ),
-);
+  );
+});
 
 function getSourceOrder(): VideoFormat[] {
   const probe = document.createElement('video');
