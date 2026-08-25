@@ -86,6 +86,7 @@ function AtlasCanvas({
   const generationRef = useRef(0);
   const readyRef = useRef(false);
   const completedRef = useRef(false);
+  const lastDrawnFrameRef = useRef(-1);
   const tickRef = useRef<(now: number) => void>(() => {});
   const pausedRef = useRef(paused);
 
@@ -153,6 +154,15 @@ function AtlasCanvas({
     }, [action, files, manifest.canvas.height, manifest.canvas.width, onReady, setStatus],
   );
 
+  const drawFrameIfChanged = useCallback(
+    async (frame: number) => {
+      if (lastDrawnFrameRef.current === frame) return;
+      await drawFrame(frame);
+      lastDrawnFrameRef.current = frame;
+    },
+    [drawFrame],
+  );
+
   useEffect(() => {
     const generation = generationRef.current + 1;
     generationRef.current = generation;
@@ -162,12 +172,13 @@ function AtlasCanvas({
     imageSrcRef.current = '';
     readyRef.current = false;
     completedRef.current = false;
+    lastDrawnFrameRef.current = -1;
 
     tickRef.current = (now: number) => {
       const elapsedSeconds = (elapsedMsRef.current + now - startedAtRef.current) / 1000;
       const frameState = getFrameState(action, elapsedSeconds, manifest.fps, loop);
 
-      void drawFrame(frameState.frame)
+      void drawFrameIfChanged(frameState.frame)
         .then(() => {
           if (generationRef.current !== generation || !runningRef.current) return;
           if (frameState.complete) {
@@ -184,7 +195,7 @@ function AtlasCanvas({
     };
 
     const initialFrame = getFrameState(action, initialElapsedMs / 1000, manifest.fps, loop).frame;
-    void drawFrame(initialFrame)
+    void drawFrameIfChanged(initialFrame)
       .then(() => {
         if (generationRef.current !== generation || pausedRef.current || action.still) return;
         startedAtRef.current = performance.now();
@@ -194,7 +205,17 @@ function AtlasCanvas({
       .catch((reason) => onError(reason instanceof Error ? reason.message : String(reason)));
 
     return stop;
-  }, [action, drawFrame, initialElapsedMs, loop, manifest.fps, onComplete, onError, restartKey, stop]);
+  }, [
+    action,
+    drawFrameIfChanged,
+    initialElapsedMs,
+    loop,
+    manifest.fps,
+    onComplete,
+    onError,
+    restartKey,
+    stop,
+  ]);
 
   useEffect(() => {
     if (!readyRef.current || action.still) return;

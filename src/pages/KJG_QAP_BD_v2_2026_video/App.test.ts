@@ -2,12 +2,20 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const appSource = readFileSync(new URL('./App.tsx', import.meta.url), 'utf8');
+const mainSource = readFileSync(new URL('./main.tsx', import.meta.url), 'utf8');
 const modalLayerSource = readFileSync(
   new URL('./components/overlays/MainModalOverlayLayer.tsx', import.meta.url),
   'utf8',
 );
 
 describe('KJG_QAP_BD_v2_2026 App', () => {
+  it('DEMO 启动只用 mock 参数选择内置数据，不指定视频渲染或回退逻辑', () => {
+    expect(mainSource).toContain("new URLSearchParams(window.location.search).has('mock')");
+    expect(mainSource).toContain("'../../shared/core/mock/KJG_QAP_BD_v2.json'");
+    expect(mainSource).toContain('import.meta.url');
+    expect(mainSource).not.toContain('renderer');
+  });
+
   it('Lobby 初始音量应默认使用 0.1 以对齐 tamic', () => {
     expect(appSource).toContain('const [soundVolume, setSoundVolume] = useState(0.1);');
   });

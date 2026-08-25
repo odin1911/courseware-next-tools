@@ -10,4 +10,15 @@ if (!app) {
   throw new Error('#app not found');
 }
 
-mountReactApp(app, <App {...getCoursewareAppPropsFromQuery()} />);
+const appProps = getCoursewareAppPropsFromQuery();
+
+if (new URLSearchParams(window.location.search).has('mock')) {
+  appProps.channel = 'ng-preview';
+  appProps.businessContentUuid = 'mock';
+  appProps.fetchDataUrl = new URL(
+    '../../shared/core/mock/KJG_QAP_BD_v2.json',
+    import.meta.url,
+  ).href;
+}
+
+mountReactApp(app, <App {...appProps} />);

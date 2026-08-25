@@ -54,7 +54,10 @@ export default function RasterCountdownOverlay({
       data-countdown-player-error={status === 'error' ? 'true' : 'false'}
       style={{
         position: 'absolute',
-        inset: 0,
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
         zIndex: 20,
         overflow: 'hidden',
         pointerEvents: 'auto',
@@ -64,7 +67,14 @@ export default function RasterCountdownOverlay({
       {showBackdrop && (
         <div
           data-testid="countdown-backdrop"
-          style={{ position: 'absolute', inset: 0, background: 'rgba(0, 0, 0, 0.5)' }}
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+          }}
         />
       )}
       <div

@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import react from '@vitejs/plugin-react';
+import legacy from '@vitejs/plugin-legacy';
 import { defineConfig } from 'vite';
 
 function resolveInput(): Record<string, string> {
@@ -19,7 +20,21 @@ export default defineConfig({
   appType: 'mpa',
   base: './',
   assetsInclude: ['**/*.zip'],
-  plugins: [react()],
+  plugins: [
+    react(),
+    legacy({
+      modernPolyfills: ['es.global-this', 'es.object.from-entries', 'es.string.replace-all'],
+      targets: [
+        'last 2 versions',
+        'iOS >= 10',
+        'Android >= 6',
+        'Chrome >= 49',
+        'Safari >= 10',
+        'Samsung >= 5',
+        'OperaMobile >= 46',
+      ],
+    }),
+  ],
   define: { global: 'globalThis' },
   resolve: {
     alias: { '@': path.resolve(__dirname, 'src') },

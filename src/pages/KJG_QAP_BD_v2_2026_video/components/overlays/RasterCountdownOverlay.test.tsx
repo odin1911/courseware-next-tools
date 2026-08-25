@@ -27,6 +27,15 @@ describe('RasterCountdownOverlay', () => {
 
     act(() => root.render(<RasterCountdownOverlay countdownValue={3} />));
 
+    const overlay = container.querySelector<HTMLElement>('[data-testid="countdown-overlay"]');
+    const backdrop = container.querySelector<HTMLElement>('[data-testid="countdown-backdrop"]');
+    for (const element of [overlay, backdrop]) {
+      expect(element?.style.left).toBe('0px');
+      expect(element?.style.top).toBe('0px');
+      expect(element?.style.right).toBe('0px');
+      expect(element?.style.bottom).toBe('0px');
+    }
+
     const player = container.querySelector<HTMLElement>('[data-raster-action="start"]');
     expect(Number.parseFloat(player?.style.left ?? '')).toBeCloseTo(270.77001953125);
     expect(Number.parseFloat(player?.style.top ?? '')).toBeCloseTo(159.99926952514647);

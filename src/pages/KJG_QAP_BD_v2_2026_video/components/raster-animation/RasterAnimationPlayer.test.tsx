@@ -198,6 +198,40 @@ describe('RasterAnimationPlayer', () => {
     expect(onComplete).not.toHaveBeenCalled();
   });
 
+  test('does not redraw the same Canvas frame on faster display refreshes', async () => {
+    const Player = await loadPlayer();
+    expect(Player).not.toBeNull();
+    if (!Player) return;
+    let nextFrame: FrameRequestCallback | undefined;
+    vi.spyOn(performance, 'now').mockReturnValue(1000);
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+      nextFrame = callback;
+      return 1;
+    });
+
+    await act(async () => {
+      root.render(
+        <Player manifest={manifest} files={files} action="start" renderer="atlas" loop />,
+      );
+      await Promise.resolve();
+    });
+    expect(drawImage).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      nextFrame?.(1010);
+      await Promise.resolve();
+      nextFrame?.(1020);
+      await Promise.resolve();
+    });
+    expect(drawImage).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      nextFrame?.(1050);
+      await Promise.resolve();
+    });
+    expect(drawImage).toHaveBeenCalledTimes(2);
+  });
+
   test('pauses and resumes Canvas without reloading its atlas', async () => {
     const Player = await loadPlayer();
     expect(Player).not.toBeNull();
