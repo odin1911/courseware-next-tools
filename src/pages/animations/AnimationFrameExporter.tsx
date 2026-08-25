@@ -4,7 +4,7 @@ import type { DragonBonesHandle } from '@/shared/components/dragonbones-player';
 import type { DragonBonesBounds } from '@/shared/components/dragonbones-player/DragonBonesPlayer';
 import { DEFAULT_ARMATURE } from '../dragonbones-tool/armatureSelection';
 import type { AnimationAsset } from './animationCatalog';
-import { buildExportGeometry, type ExportPoint } from './frameExporter';
+import { buildExportGeometry } from './frameExporter';
 
 type ExportActionMeta = {
   name: string;
@@ -20,7 +20,7 @@ type FrameExporterApi = {
     asset: string;
     fps: number;
     canvas: { width: number; height: number };
-    anchor: ExportPoint;
+    anchor: { x: number; y: number };
     sourceBounds: DragonBonesBounds;
     actions: ExportActionMeta[];
   };
@@ -36,13 +36,7 @@ declare global {
 const EXPORT_PADDING = 2;
 const MEASURE_CANVAS_SIZE = 2048;
 
-export default function AnimationFrameExporter({
-  asset,
-  origin,
-}: {
-  asset: AnimationAsset;
-  origin: ExportPoint;
-}) {
+export default function AnimationFrameExporter({ asset }: { asset: AnimationAsset }) {
   const playerRef = useRef<DragonBonesHandle | null>(null);
   const [status, setStatus] = useState<FrameExporterApi['status']>('loading');
   const [error, setError] = useState('');
@@ -88,7 +82,7 @@ export default function AnimationFrameExporter({
         }
       }
 
-      const geometry = buildExportGeometry(frameBounds, origin, EXPORT_PADDING);
+      const geometry = buildExportGeometry(frameBounds, EXPORT_PADDING);
       player.resizeCanvas(geometry.canvas.width, geometry.canvas.height);
       player.setDisplayTransform(geometry.transform);
       const fps = actions[0]?.frameRate ?? 24;

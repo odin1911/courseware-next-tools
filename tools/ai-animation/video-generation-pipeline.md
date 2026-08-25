@@ -8,7 +8,7 @@
 
 当前存在两种上游数据源：
 
-- 临时 DragonBones 迁移输入：`src/pages/animations/frameExporter.ts` 负责计算统一画布、裁剪范围、资源锚点和位移；`AnimationFrameExporter.capture()` 负责输出 straight-alpha PNG 像素。当前实现仍把模板 `origin` 传入锚点计算，这是待拆分的过渡状态。
+- 临时 DragonBones 迁移输入：`src/pages/animations/frameExporter.ts` 负责计算统一画布、裁剪范围、资源内在锚点和位移；`AnimationFrameExporter.capture()` 负责输出 straight-alpha PNG 像素。
 - 正式 AI 输入：AI 生成的 alpha MOV、WebM 或 MP4，由生成工具先提取为 RGBA PNG 帧。
 
 因此，`frameExporter.ts` 是当前 DragonBones 转视频路径的几何数据源头，但不是直接写出视频的模块。三个交付格式共同的标准转码中间输入是 RGBA PNG 帧序列。未来使用 AI alpha 视频时，会绕过 DragonBones 导出阶段。
@@ -61,14 +61,6 @@ flowchart TD
 }
 ```
 
-当前实现满足：
-
-```text
-anchor + transform = 原模板坐标 origin
-```
-
-这个公式把资源裁剪坐标和模板布局坐标混入了同一个 `anchor`。转换规范要求拆分为：
-
 ```text
 assetAnchor = minBounds - exportPadding
 assetAnchor + transform = 0
@@ -81,12 +73,12 @@ renderTop  = templateOrigin.y + assetAnchor.y
 
 `capture()` 调用 `canvas.toDataURL('image/png')` 输出 straight-alpha PNG。导出器使用 `transparentMode="notMultiplied"`，不应在此阶段预乘 alpha：WebM 和 PNG 图集直接使用 straight alpha，只有 MOV 分支在编码前单独执行 premultiply。
 
-`export-dragonbones-frames.mjs` 会自行启动 Vite 和无头 Chromium，遍历 `src/pages/animations/assets`，把浏览器中的元数据和 PNG data URL 原子写入磁盘。当前脚本还会读取 `exportProfiles.json` 取得 `origin` 和循环动作；该文件只属于试点期过渡实现，不是可扩展的转换输入规范：
+`export-dragonbones-frames.mjs` 会自行启动 Vite 和无头 Chromium，遍历 `src/pages/animations/assets`，把浏览器中的元数据、生成配置和 PNG data URL 原子写入磁盘。转换不读取模板位置或循环策略：
 
 ```sh
 node tools/ai-animation/export-dragonbones-frames.mjs \
   /tmp/all-animation-frames \
-  tools/ai-animation/configs
+  /tmp/all-animation-configs
 ```
 
 输出目录结构为：
@@ -124,9 +116,7 @@ node tools/ai-animation/export-dragonbones-frames.mjs \
 - `frameCount`、`fps` 描述标准化后的帧序列。
 - 动作可通过 `source` 显式指定输入路径。
 
-`configs/*.json` 是测量阶段的输出、编码阶段的输入，不是需要人工长期维护的预配置。批量迁移时应生成到本次任务的临时工作目录；仓库当前保留这些文件仅用于试点复现。
-
-当前配置中的 `loop` 来自 `exportProfiles.json`，当前 `anchor` 也包含模板 `origin`。二者都是待移除的过渡字段来源；在职责拆分完成前，不应把当前文件格式当成新模板转换规范。
+`configs/*.json` 是测量阶段的输出、编码阶段的输入，不是需要人工长期维护的预配置。批量迁移时生成到本次任务的临时工作目录，不提交到仓库。
 
 ### 3.1 转换与模板职责边界
 
@@ -226,7 +216,7 @@ duration = frameCount / fps
 
 图集以 2048px 为最大边长，自动计算列数、行数、分页数量和每页起始帧。
 
-当前 `manifest.json` 仍包含 `loop`，因为现播放器从资源 manifest 读取循环策略。完成职责拆分后应删除该字段，改由模板调用播放器时传入；媒体生成不因 `loop` 不同而重新编码。
+`manifest.json` 当前版本为 v2，不包含 `origin` 或 `loop`。模板调用播放器时传入这两个参数；同一媒体资源不会因使用位置或循环策略不同而重新编码。播放器拒绝 v1 manifest，防止把曾经混入模板 origin 的旧 anchor 静默当作资源锚点。
 
 ## 6. VP9-alpha WebM
 
@@ -283,7 +273,7 @@ pix_fmt=rgba
 
 ```sh
 node tools/ai-animation/build-animation-assets.mjs \
-  tools/ai-animation/configs \
+  /tmp/all-animation-configs \
   /tmp/all-animation-frames \
   /tmp/all-animation-raster
 ```
@@ -318,4 +308,11 @@ Canvas 图集播放器按照 `elapsedSeconds × fps` 计算帧号，按需加载
 - AI alpha 视频可以直接作为生成工具输入，但仍需要自动产生准确的 fps、帧数、画布和资源锚点元数据。
 - DragonBones 浏览器导出到磁盘帧目录已有一键命令；取得正式 AI 输入后，该临时入口可以停止使用，但无需改变下游生成器和播放器。
 - HEVC-alpha MOV 编码当前绑定 macOS；WebM 和 PNG 图集生成逻辑可跨平台运行。
-- `exportProfiles.json`、配置中的 `loop` 以及混入模板 `origin` 的 `anchor` 都是当前试点实现，后续转换工具必须按本文规范拆分后才能用于大规模模板迁移。
+
+## 12. 验收边界
+
+- WebM 自动验收：49 个动态动作可在 Chromium 播放，透明合成正常；循环、单次完成、暂停恢复和视频失败接续图集测试通过。
+- PNG 自动验收：63 个动作都能通过分页图集或单帧 PNG 显示；强制图集和视频失败降级均不继续使用失败视频。
+- WebM 与 PNG 对同一动作使用同一个 `canvas`、`anchor`、模板 `origin` 和 `loop`，关键非零 origin 资源的播放器外层位置必须一致。
+- MOV 在 Safari 中人工验收，记录 macOS/iOS 与 Safari 版本、实际 `.mov` 资源、透明边缘、循环/完成和失败降级结果。
+- UA 模拟只能验证选型逻辑，不能证明 Chrome 56、Android 9、iOS 12 或 iOS 13+ 的真实解码兼容性；需要“真机已验证”结论时必须使用对应真机或云真机。

@@ -24,6 +24,9 @@ function filesFor(asset: string) {
 export function getRasterAsset(asset: string) {
   const manifest = manifestModules[`./assets/raster/${asset}/manifest.json`];
   if (!manifest) throw new Error(`unknown raster asset: ${asset}`);
+  if (manifest.version !== 2) {
+    throw new Error(`unsupported raster manifest version: ${manifest.version}`);
+  }
 
   return { manifest, files: filesFor(asset) };
 }

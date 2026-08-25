@@ -14,7 +14,6 @@ const manifest = {
     start: {
       frameCount: 2,
       duration: 2 / 24,
-      loop: false,
       webm: 'start.webm',
       mov: 'start.mov',
       atlases: [
@@ -140,6 +139,63 @@ describe('RasterAnimationPlayer', () => {
     });
 
     expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  test('combines template origin with the asset anchor and loops video on request', async () => {
+    const Player = await loadPlayer();
+    expect(Player).not.toBeNull();
+    if (!Player) return;
+
+    await act(async () => {
+      root.render(
+        <Player
+          manifest={manifest}
+          files={files}
+          action="start"
+          renderer="webm"
+          origin={{ x: 10, y: 20 }}
+          loop
+        />,
+      );
+    });
+
+    const player = container.querySelector<HTMLElement>('[data-raster-action="start"]');
+    expect(player?.style.left).toBe('15px');
+    expect(player?.style.top).toBe('27px');
+    expect(container.querySelector('video')?.loop).toBe(true);
+  });
+
+  test('keeps Canvas running when the current playback requests looping', async () => {
+    const Player = await loadPlayer();
+    expect(Player).not.toBeNull();
+    if (!Player) return;
+    const onComplete = vi.fn();
+    let nextFrame: FrameRequestCallback | undefined;
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+      nextFrame = callback;
+      return 1;
+    });
+
+    await act(async () => {
+      root.render(
+        <Player
+          manifest={manifest}
+          files={files}
+          action="start"
+          renderer="atlas"
+          loop
+          onComplete={onComplete}
+        />,
+      );
+      await Promise.resolve();
+    });
+
+    await act(async () => {
+      nextFrame?.(performance.now() + 100);
+      await Promise.resolve();
+    });
+
+    expect(onComplete).not.toHaveBeenCalled();
   });
 
   test('pauses and resumes Canvas without reloading its atlas', async () => {

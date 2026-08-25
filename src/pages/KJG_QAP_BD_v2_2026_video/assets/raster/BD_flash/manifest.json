@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "asset": "BD_flash",
   "fps": 24,
   "canvas": {
@@ -14,7 +14,6 @@
     "start": {
       "frameCount": 32,
       "duration": 1.3333333333333333,
-      "loop": true,
       "webm": "start.webm",
       "mov": "start.mov",
       "atlases": [
@@ -65,7 +64,6 @@
     "end": {
       "frameCount": 1,
       "duration": 0.041666666666666664,
-      "loop": false,
       "still": "end.png"
     }
   }

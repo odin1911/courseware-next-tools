@@ -28,11 +28,20 @@ describe('raster animation playback', () => {
 
     expect(
       playback?.getFrameState(
-        { frameCount: 10, duration: 10 / 24, loop: false },
+        { frameCount: 10, duration: 10 / 24 },
         0.5,
         24,
+        false,
       ),
     ).toEqual({ frame: 9, complete: true });
+  });
+
+  test('wraps frames when the current playback requests looping', async () => {
+    const playback = await loadPlayback();
+
+    expect(
+      playback?.getFrameState({ frameCount: 10, duration: 10 / 24 }, 0.5, 24, true),
+    ).toEqual({ frame: 2, complete: false });
   });
 
   test('locates a frame in the lazily loaded atlas page', async () => {

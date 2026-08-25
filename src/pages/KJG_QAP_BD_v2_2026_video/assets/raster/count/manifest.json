@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "asset": "count",
   "fps": 24,
   "canvas": {
@@ -7,14 +7,13 @@
     "height": 378
   },
   "anchor": {
-    "x": 270.77001953125,
-    "y": 159.99926952514647
+    "x": -45.22998046875,
+    "y": -2.0007304748535155
   },
   "actions": {
     "start": {
       "frameCount": 76,
       "duration": 3.1666666666666665,
-      "loop": false,
       "webm": "start.webm",
       "mov": "start.mov",
       "atlases": [
@@ -65,7 +64,6 @@
     "end": {
       "frameCount": 1,
       "duration": 0.041666666666666664,
-      "loop": false,
       "still": "end.png"
     }
   }

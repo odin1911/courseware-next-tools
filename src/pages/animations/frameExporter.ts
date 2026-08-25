@@ -1,10 +1,7 @@
 import type { DragonBonesBounds } from '@/shared/components/dragonbones-player/DragonBonesPlayer';
 
-export type ExportPoint = { x: number; y: number };
-
 export function buildExportGeometry(
   bounds: DragonBonesBounds[],
-  origin: ExportPoint,
   padding: number,
 ) {
   if (bounds.length === 0) {
@@ -30,8 +27,8 @@ export function buildExportGeometry(
       height: canvasHeight + (canvasHeight % 2),
     },
     anchor: {
-      x: origin.x + minX - padding,
-      y: origin.y + minY - padding,
+      x: minX - padding,
+      y: minY - padding,
     },
     transform: {
       x: padding - minX,

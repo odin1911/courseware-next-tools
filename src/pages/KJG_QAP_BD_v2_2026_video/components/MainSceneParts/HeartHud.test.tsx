@@ -35,6 +35,10 @@ describe('HeartHud raster break animation', () => {
     expect(container.querySelector('video')?.src).toContain('/heart/start.webm');
     expect(container.querySelector('[data-anim-phase="breaking"]')).not.toBeNull();
     expect(container.querySelector('[data-testid="legacy-heart-hud"]')).toBeNull();
+    const player = container.querySelector<HTMLElement>('[data-raster-action="start"]');
+    expect(Number.parseFloat(player?.style.left ?? '')).toBeCloseTo(310.5299987792969);
+    expect(Number.parseFloat(player?.style.top ?? '')).toBeCloseTo(213.64999389648438);
+    expect(player?.querySelector('video')?.loop).toBe(false);
 
     act(() => vi.advanceTimersByTime(500));
     expect(container.querySelector('[data-anim-phase="returning"]')).not.toBeNull();

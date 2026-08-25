@@ -26,6 +26,18 @@ describe('raster asset registry', () => {
     expect(() => getRasterAsset('missing')).toThrow('unknown raster asset: missing');
   });
 
+  test('rejects a legacy manifest whose anchor may contain template origin', () => {
+    const manifest = getRasterAsset('BD_ola').manifest;
+    const version = manifest.version;
+
+    try {
+      manifest.version = 1;
+      expect(() => getRasterAsset('BD_ola')).toThrow('unsupported raster manifest version: 1');
+    } finally {
+      manifest.version = version;
+    }
+  });
+
   test('lists every generated resource in stable order', () => {
     expect(getRasterAssetNames()).toHaveLength(14);
     expect(getRasterAssetNames()[0]).toBe('BD_close');

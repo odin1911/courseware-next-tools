@@ -2,13 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-export function createExportConfig(meta, profile) {
-  if (!profile?.origin || !Number.isFinite(profile.origin.x) || !Number.isFinite(profile.origin.y)) {
-    throw new Error(`${meta.asset} export profile is missing origin`);
-  }
-
-  const loopActions = new Set(profile.loopActions ?? []);
-
+export function createExportConfig(meta) {
   return {
     asset: meta.asset,
     fps: meta.fps,
@@ -17,7 +11,6 @@ export function createExportConfig(meta, profile) {
     actions: meta.actions.map(({ name, frameCount }) => ({
       name,
       frameCount,
-      loop: loopActions.has(name),
     })),
   };
 }
@@ -42,19 +35,12 @@ export function writeCapturedFrame(root, asset, action, zeroBasedFrame, dataUrl)
 
 export async function exportCapturedAssets({
   assets,
-  profiles,
   framesRoot,
   configDir,
   loadAsset,
 }) {
   if (fs.existsSync(framesRoot)) {
     throw new Error(`output already exists: ${framesRoot}`);
-  }
-
-  for (const asset of assets) {
-    if (!profiles[asset]?.origin) {
-      throw new Error(`${asset} export profile is missing origin`);
-    }
   }
 
   const framesParent = path.dirname(framesRoot);
@@ -66,8 +52,8 @@ export async function exportCapturedAssets({
 
   try {
     for (const asset of [...assets].sort()) {
-      const captured = await loadAsset(asset, profiles[asset]);
-      const config = createExportConfig(captured.meta, profiles[asset]);
+      const captured = await loadAsset(asset);
+      const config = createExportConfig(captured.meta);
 
       for (const action of captured.meta.actions) {
         for (let frame = 0; frame < action.frameCount; frame += 1) {
@@ -111,9 +97,6 @@ async function runCli(framesRoot, configDir) {
   const scriptDir = path.dirname(new URL(import.meta.url).pathname);
   const repoRoot = path.resolve(scriptDir, '../..');
   const assetsDir = path.join(repoRoot, 'src/pages/animations/assets');
-  const profiles = JSON.parse(
-    fs.readFileSync(path.join(repoRoot, 'src/pages/animations/exportProfiles.json'), 'utf8'),
-  );
   const assets = fs
     .readdirSync(assetsDir)
     .filter((name) => name.endsWith('.zip'))
@@ -137,7 +120,6 @@ async function runCli(framesRoot, configDir) {
 
     await exportCapturedAssets({
       assets,
-      profiles,
       framesRoot: path.resolve(framesRoot),
       configDir: path.resolve(configDir),
       loadAsset: async (asset) => {

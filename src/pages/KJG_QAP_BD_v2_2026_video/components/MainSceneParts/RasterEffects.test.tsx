@@ -41,6 +41,9 @@ describe('main scene raster effects', () => {
     expect(sources.some((source) => source.includes('/BD_pay_money/start.webm'))).toBe(true);
     expect(sources.some((source) => source.includes('/BD_flash/start.webm'))).toBe(true);
     expect(container.querySelector('[data-testid="legacy-dragonbones"]')).toBeNull();
+    const videos = [...container.querySelectorAll('video')];
+    expect(videos.find((video) => video.src.includes('/BD_pay_money/'))?.loop).toBe(false);
+    expect(videos.find((video) => video.src.includes('/BD_flash/'))?.loop).toBe(true);
 
     act(() => root.unmount());
   });

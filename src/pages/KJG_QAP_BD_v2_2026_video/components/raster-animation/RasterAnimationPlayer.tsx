@@ -16,6 +16,8 @@ export interface RasterAnimationPlayerProps {
   manifest: RasterManifest;
   files: Record<string, string>;
   action: string;
+  origin?: { x: number; y: number };
+  loop?: boolean;
   paused?: boolean;
   restartKey?: number | string;
   renderer?: RasterRendererPreference;
@@ -53,6 +55,7 @@ function AtlasCanvas({
   manifest,
   files,
   action,
+  loop,
   paused,
   restartKey,
   initialElapsedMs,
@@ -64,6 +67,7 @@ function AtlasCanvas({
   manifest: RasterManifest;
   files: Record<string, string>;
   action: RasterAction;
+  loop: boolean;
   paused: boolean;
   restartKey?: number | string;
   initialElapsedMs: number;
@@ -161,7 +165,7 @@ function AtlasCanvas({
 
     tickRef.current = (now: number) => {
       const elapsedSeconds = (elapsedMsRef.current + now - startedAtRef.current) / 1000;
-      const frameState = getFrameState(action, elapsedSeconds, manifest.fps);
+      const frameState = getFrameState(action, elapsedSeconds, manifest.fps, loop);
 
       void drawFrame(frameState.frame)
         .then(() => {
@@ -179,7 +183,7 @@ function AtlasCanvas({
         .catch((reason) => onError(reason instanceof Error ? reason.message : String(reason)));
     };
 
-    const initialFrame = getFrameState(action, initialElapsedMs / 1000, manifest.fps).frame;
+    const initialFrame = getFrameState(action, initialElapsedMs / 1000, manifest.fps, loop).frame;
     void drawFrame(initialFrame)
       .then(() => {
         if (generationRef.current !== generation || pausedRef.current || action.still) return;
@@ -190,7 +194,7 @@ function AtlasCanvas({
       .catch((reason) => onError(reason instanceof Error ? reason.message : String(reason)));
 
     return stop;
-  }, [action, drawFrame, initialElapsedMs, manifest.fps, onComplete, onError, restartKey, stop]);
+  }, [action, drawFrame, initialElapsedMs, loop, manifest.fps, onComplete, onError, restartKey, stop]);
 
   useEffect(() => {
     if (!readyRef.current || action.still) return;
@@ -224,6 +228,8 @@ export default function RasterAnimationPlayer({
   manifest,
   files,
   action: actionName,
+  origin = { x: 0, y: 0 },
+  loop = false,
   paused = false,
   restartKey,
   renderer,
@@ -306,14 +312,22 @@ export default function RasterAnimationPlayer({
   const rootStyle = useMemo<CSSProperties>(
     () => ({
       position: 'absolute',
-      left: manifest.anchor.x,
-      top: manifest.anchor.y,
+      left: origin.x + manifest.anchor.x,
+      top: origin.y + manifest.anchor.y,
       width: manifest.canvas.width,
       height: manifest.canvas.height,
       pointerEvents: 'none',
       ...style,
     }),
-    [manifest.anchor.x, manifest.anchor.y, manifest.canvas.height, manifest.canvas.width, style],
+    [
+      manifest.anchor.x,
+      manifest.anchor.y,
+      manifest.canvas.height,
+      manifest.canvas.width,
+      origin.x,
+      origin.y,
+      style,
+    ],
   );
 
   if (!action) {
@@ -340,6 +354,7 @@ export default function RasterAnimationPlayer({
           manifest={manifest}
           files={files}
           action={action}
+          loop={loop}
           paused={paused}
           restartKey={restartKey}
           initialElapsedMs={atlasInitialElapsedMs}
@@ -355,7 +370,7 @@ export default function RasterAnimationPlayer({
           muted
           playsInline
           preload="auto"
-          loop={action.loop}
+          loop={loop}
           aria-hidden="true"
           onLoadedData={() => {
             setStatus('video');

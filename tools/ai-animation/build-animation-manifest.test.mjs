@@ -13,7 +13,6 @@ describe('animation asset manifest', () => {
         name: 'wait',
         frameCount: 146,
         fps: 24,
-        loop: true,
         width: 653,
         height: 674,
         maxTextureSize: 4096,
@@ -21,7 +20,6 @@ describe('animation asset manifest', () => {
     ).toEqual({
       frameCount: 146,
       duration: 146 / 24,
-      loop: true,
       webm: 'wait.webm',
       mov: 'wait.mov',
       atlases: [
@@ -42,14 +40,12 @@ describe('animation asset manifest', () => {
         name: 'end',
         frameCount: 1,
         fps: 24,
-        loop: false,
         width: 653,
         height: 674,
       }),
     ).toEqual({
       frameCount: 1,
       duration: 1 / 24,
-      loop: false,
       still: 'end.png',
     });
   });
@@ -62,7 +58,6 @@ describe('animation asset manifest', () => {
         name: 'start',
         frameCount: 10,
         fps: 24,
-        loop: true,
         width: 364,
         height: 230,
       }).atlases,
@@ -80,8 +75,39 @@ describe('animation asset manifest', () => {
         fps: 24,
         canvas: { width: 0, height: 674 },
         anchor: { x: 240, y: 365 },
-        actions: [{ name: 'wait', frameCount: 146, loop: true }],
+        actions: [{ name: 'wait', frameCount: 146 }],
       }),
     ).toThrow('canvas.width');
+  });
+
+  test('emits a v2 manifest and drops legacy loop fields', async () => {
+    const builder = await loadManifestBuilder();
+
+    expect(
+      builder?.buildManifest({
+        asset: 'BD_laki',
+        fps: 24,
+        canvas: { width: 100, height: 80 },
+        anchor: { x: -12, y: -17 },
+        actions: [{ name: 'wait', frameCount: 2, loop: true }],
+      }),
+    ).toEqual({
+      version: 2,
+      asset: 'BD_laki',
+      fps: 24,
+      canvas: { width: 100, height: 80 },
+      anchor: { x: -12, y: -17 },
+      actions: {
+        wait: {
+          frameCount: 2,
+          duration: 2 / 24,
+          webm: 'wait.webm',
+          mov: 'wait.mov',
+          atlases: [
+            { src: 'wait-atlas-01.png', columns: 20, rows: 1, startFrame: 0, frameCount: 2 },
+          ],
+        },
+      },
+    });
   });
 });

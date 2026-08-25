@@ -12,7 +12,6 @@ export type RasterAtlas = {
 export type RasterAction = {
   frameCount: number;
   duration: number;
-  loop: boolean;
   webm?: string;
   mov?: string;
   atlases?: readonly RasterAtlas[];
@@ -57,13 +56,14 @@ export function selectRasterRenderer({
 }
 
 export function getFrameState(
-  action: Pick<RasterAction, 'frameCount' | 'duration' | 'loop'>,
+  action: Pick<RasterAction, 'frameCount' | 'duration'>,
   elapsedSeconds: number,
   fps: number,
+  loop: boolean,
 ) {
   const rawFrame = Math.max(0, Math.floor(elapsedSeconds * fps));
 
-  if (action.loop) {
+  if (loop) {
     return { frame: rawFrame % action.frameCount, complete: false };
   }
 

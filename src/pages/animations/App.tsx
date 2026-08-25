@@ -5,7 +5,6 @@ import { DEFAULT_ARMATURE } from '../dragonbones-tool/armatureSelection';
 import { buildAnimationCatalog, resolveSelectedAnimation } from './animationCatalog';
 import type { AnimationAsset } from './animationCatalog';
 import AnimationFrameExporter from './AnimationFrameExporter';
-import exportProfiles from './exportProfiles.json';
 import './App.css';
 
 const animationModules = import.meta.glob('./assets/*.zip', {
@@ -15,11 +14,6 @@ const animationModules = import.meta.glob('./assets/*.zip', {
 }) as Record<string, string>;
 
 const animationAssets = buildAnimationCatalog(animationModules);
-
-const EXPORT_PROFILES = exportProfiles as Record<
-  string,
-  { origin: { x: number; y: number }; loopActions: string[] }
->;
 
 function LivePreview({ asset, showDebugBounds }: { asset: AnimationAsset; showDebugBounds: boolean }) {
   const [error, setError] = useState('');
@@ -234,12 +228,7 @@ export default function App() {
   const selectedAsset = resolveSelectedAnimation(search, animationAssets);
 
   if (exportAsset) {
-    return (
-      <AnimationFrameExporter
-        asset={exportAsset}
-        origin={EXPORT_PROFILES[exportAsset.fileName].origin}
-      />
-    );
+    return <AnimationFrameExporter asset={exportAsset} />;
   }
 
   if (exportFileName) {

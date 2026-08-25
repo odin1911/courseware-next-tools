@@ -5,6 +5,7 @@ import {
   getMaluMoveDuration,
   MALU_ENTRY_START_X,
   resolveMaluAnimation,
+  shouldLoopMaluAnimation,
 } from '../../logic/runtime';
 
 const RASTER_ASSETS = {
@@ -17,6 +18,13 @@ const RASTER_ASSETS = {
 
 const MALU_VIEWPORT_WIDTH = 173;
 const MALU_VIEWPORT_HEIGHT = 474;
+const MALU_SLOT_TOP_BY_CHAR: Record<string, number> = {
+  ola: 244,
+  laki: 245,
+  lele: 245,
+  nani: 238,
+  pili: 245,
+};
 
 export interface MaluCharacterProps {
   charName: string;
@@ -44,6 +52,7 @@ export default function MaluCharacter({
   const rasterAsset = RASTER_ASSETS[charName as keyof typeof RASTER_ASSETS] ?? RASTER_ASSETS.ola;
   const rasterAnimationList = Object.keys(rasterAsset.manifest.actions);
   const rasterAnimation = resolveMaluAnimation(rasterAnimationList, animationName);
+  const slotTop = MALU_SLOT_TOP_BY_CHAR[charName] ?? 244;
   const entryFrameRef = useRef<number | null>(null);
   const entryTimerRef = useRef<number | null>(null);
   const motionRef = useRef({
@@ -212,6 +221,8 @@ export default function MaluCharacter({
         manifest={rasterAsset.manifest}
         files={rasterAsset.files}
         action={rasterAnimation}
+        origin={{ x: 0, y: slotTop }}
+        loop={shouldLoopMaluAnimation(animationName, rasterAnimation)}
         paused={paused}
         restartKey={`${entryKey}:${animationName}`}
       />

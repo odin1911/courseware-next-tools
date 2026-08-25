@@ -14,7 +14,6 @@ export function createActionEntry({
   name,
   frameCount,
   fps,
-  loop,
   width,
   height,
   maxTextureSize = DEFAULT_MAX_TEXTURE_SIZE,
@@ -31,7 +30,6 @@ export function createActionEntry({
   const base = {
     frameCount,
     duration: frameCount / fps,
-    loop: Boolean(loop),
   };
 
   if (frameCount === 1) {
@@ -102,7 +100,7 @@ export function buildManifest({ asset, fps, canvas, anchor, actions }) {
   }
 
   return {
-    version: 1,
+    version: 2,
     asset,
     fps,
     canvas,

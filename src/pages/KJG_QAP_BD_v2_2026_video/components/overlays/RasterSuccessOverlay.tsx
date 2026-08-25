@@ -105,6 +105,7 @@ export default function RasterSuccessOverlay({
             manifest={rasterAsset.manifest}
             files={rasterAsset.files}
             action="start"
+            loop
           />
         </div>
         <button

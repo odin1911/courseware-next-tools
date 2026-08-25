@@ -31,9 +31,11 @@ describe('ResultOverlay raster resources', () => {
 
     act(() => root.render(<ResultOverlay result="success" onConfirm={() => {}} />));
     expect(container.querySelector('video')?.src).toContain('/BD_mission_successed/start.webm');
+    expect(container.querySelector('video')?.loop).toBe(true);
 
     act(() => root.render(<ResultOverlay result="fail" onConfirm={() => {}} />));
     expect(container.querySelector('video')?.src).toContain('/BD_mission_failed/start.webm');
+    expect(container.querySelector('video')?.loop).toBe(true);
     expect(container.querySelector('[data-testid="legacy-result-overlay"]')).toBeNull();
 
     act(() => root.unmount());

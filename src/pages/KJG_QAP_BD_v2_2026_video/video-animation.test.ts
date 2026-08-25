@@ -13,6 +13,7 @@ type ManifestAction = {
 };
 
 type Manifest = {
+  version: number;
   canvas: { width: number; height: number };
   actions: Record<string, ManifestAction>;
 };
@@ -37,8 +38,13 @@ describe('KJG_QAP_BD_v2_2026 video animation migration', () => {
     expect(actions.filter((action) => action.webm && action.mov)).toHaveLength(49);
     expect(actions.filter((action) => action.still)).toHaveLength(14);
     for (const [, manifest] of manifests) {
+      expect(manifest.version).toBe(2);
+      expect(manifest).not.toHaveProperty('origin');
       expect(manifest.canvas.width % 2).toBe(0);
       expect(manifest.canvas.height % 2).toBe(0);
+      for (const action of Object.values(manifest.actions)) {
+        expect(action).not.toHaveProperty('loop');
+      }
     }
   });
 

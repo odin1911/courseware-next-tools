@@ -154,6 +154,7 @@ export default function HeartHud({
               manifest={HEART_ASSET.manifest}
               files={HEART_ASSET.files}
               action="start"
+              origin={{ x: CENTER_X, y: CENTER_Y }}
               restartKey={heartIndex}
             />
           </div>

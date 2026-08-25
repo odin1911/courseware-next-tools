@@ -82,6 +82,7 @@ export default function RasterCountdownOverlay({
           manifest={countRasterAsset.manifest}
           files={countRasterAsset.files}
           action="start"
+          origin={{ x: 316, y: 162 }}
           onReady={() => setStatus('ready')}
           onComplete={triggerComplete}
           onError={() => {

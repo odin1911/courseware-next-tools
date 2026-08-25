@@ -34,7 +34,7 @@ describe('DragonBones frame export files', () => {
     expect(fs.readFileSync(output)).toEqual(png);
   });
 
-  test('creates config actions from measured metadata and explicit loop actions', () => {
+  test('creates config entirely from measured metadata', () => {
     const config = createExportConfig(
       {
         asset: 'BD_ola',
@@ -47,7 +47,6 @@ describe('DragonBones frame export files', () => {
           { name: 'end', frameCount: 1, duration: 1 / 24, frameRate: 24 },
         ],
       },
-      { origin: { x: 0, y: 244 }, loopActions: ['enter', 'wait'] },
     );
 
     expect(config).toEqual({
@@ -56,26 +55,11 @@ describe('DragonBones frame export files', () => {
       canvas: { width: 184, height: 215 },
       anchor: { x: -96, y: 30 },
       actions: [
-        { name: 'enter', frameCount: 18, loop: true },
-        { name: 'wait', frameCount: 152, loop: true },
-        { name: 'end', frameCount: 1, loop: false },
+        { name: 'enter', frameCount: 18 },
+        { name: 'wait', frameCount: 152 },
+        { name: 'end', frameCount: 1 },
       ],
     });
-  });
-
-  test('rejects profiles without an origin', () => {
-    expect(() =>
-      createExportConfig(
-        {
-          asset: 'heart',
-          fps: 24,
-          canvas: { width: 10, height: 10 },
-          anchor: { x: 0, y: 0 },
-          actions: [{ name: 'start', frameCount: 2, duration: 2 / 24, frameRate: 24 }],
-        },
-        { loopActions: [] },
-      ),
-    ).toThrow('heart export profile is missing origin');
   });
 
   test('exports captured frames and config without exposing partial output', async () => {
@@ -87,9 +71,6 @@ describe('DragonBones frame export files', () => {
 
     await exportCapturedAssets({
       assets: ['BD_flash.zip'],
-      profiles: {
-        'BD_flash.zip': { origin: { x: 0, y: 0 }, loopActions: ['start'] },
-      },
       framesRoot,
       configDir,
       loadAsset: async () => ({
@@ -117,8 +98,8 @@ describe('DragonBones frame export files', () => {
       canvas: { width: 20, height: 22 },
       anchor: { x: -2, y: -2 },
       actions: [
-        { name: 'start', frameCount: 2, loop: true },
-        { name: 'end', frameCount: 1, loop: false },
+        { name: 'start', frameCount: 2 },
+        { name: 'end', frameCount: 1 },
       ],
     });
   });
@@ -131,7 +112,6 @@ describe('DragonBones frame export files', () => {
     await expect(
       exportCapturedAssets({
         assets: ['heart.zip'],
-        profiles: { 'heart.zip': { origin: { x: 512, y: 384 }, loopActions: [] } },
         framesRoot,
         configDir: path.join(root, 'configs'),
         loadAsset: async () => ({

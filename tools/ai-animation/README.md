@@ -15,16 +15,16 @@
 ```sh
 node tools/ai-animation/export-dragonbones-frames.mjs \
   /tmp/all-animation-frames \
-  tools/ai-animation/configs
+  /tmp/all-animation-configs
 ```
 
-脚本会自行启动 Vite 和无头 Chromium，读取 `src/pages/animations/exportProfiles.json`，并通过 `window.__dragonBonesFrameExporter` 保存 63 个动作。帧输出目录必须不存在；资源、profile、动作或任一帧失败时不会留下正式输出目录。
+脚本会自行启动 Vite 和无头 Chromium，通过 `window.__dragonBonesFrameExporter` 保存 63 个动作，并根据测量结果同时生成配置。帧输出目录必须不存在；资源、动作或任一帧失败时不会留下正式输出目录。配置是本次任务的中间产物，不提交到仓库。
 
 批量生成 14 个资源：
 
 ```sh
 node tools/ai-animation/build-animation-assets.mjs \
-  tools/ai-animation/configs \
+  /tmp/all-animation-configs \
   /tmp/all-animation-frames \
   /tmp/all-animation-raster
 ```
@@ -35,7 +35,7 @@ node tools/ai-animation/build-animation-assets.mjs \
 
 ```sh
 tools/ai-animation/build-animation-assets.sh \
-  tools/ai-animation/configs/BD_laki.json \
+  /tmp/all-animation-configs/BD_laki.json \
   /path/to/source-root \
   src/pages/KJG_QAP_BD_v2_2026_video/assets/raster/BD_laki
 ```

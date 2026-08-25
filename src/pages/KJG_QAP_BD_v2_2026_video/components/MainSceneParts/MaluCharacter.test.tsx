@@ -44,6 +44,20 @@ describe('MaluCharacter raster resources', () => {
     expect(container.querySelectorAll('[data-role="malu"][data-render-mode="raster"]')).toHaveLength(5);
     expect(container.querySelectorAll('[data-raster-action="wait"]')).toHaveLength(5);
     expect(container.querySelector('[data-testid="legacy-dragonbones"]')).toBeNull();
+    const expectedTop = {
+      laki: 34.66999816894531,
+      lele: 45.339996337890625,
+      nani: 45.149993896484375,
+      ola: 53.69,
+      pili: 41.44,
+    };
+
+    for (const malu of container.querySelectorAll<HTMLElement>('[data-role="malu"]')) {
+      const name = malu.dataset.maluName as keyof typeof expectedTop;
+      const player = malu.querySelector<HTMLElement>('[data-raster-action="wait"]');
+      expect(Number.parseFloat(player?.style.top ?? '')).toBeCloseTo(expectedTop[name]);
+      expect(player?.querySelector('video')?.loop).toBe(true);
+    }
 
     act(() => root.unmount());
   });

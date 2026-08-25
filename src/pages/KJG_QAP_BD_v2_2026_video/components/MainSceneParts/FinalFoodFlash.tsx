@@ -17,6 +17,7 @@ export default function FinalFoodFlash() {
       manifest={FLASH_ASSET.manifest}
       files={FLASH_ASSET.files}
       action="start"
+      loop
       style={{
         left:
           -201 + (FLASH_VIEWPORT_WIDTH - FLASH_ASSET.manifest.canvas.width * fitScale) / 2,

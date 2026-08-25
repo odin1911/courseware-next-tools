@@ -10,6 +10,12 @@ yarn dev --host 0.0.0.0
 
 默认本机地址为 `http://127.0.0.1:5173`。手机验收时，手机与电脑需连接同一局域网，并把链接中的 `127.0.0.1` 替换为电脑局域网 IP，例如 `192.168.68.65`。
 
+## 验收责任
+
+- WebM 与 PNG 图集属于自动验收门槛：覆盖资源清单、实际 WebM 加载、强制图集、视频错误降级、循环/完成、暂停恢复和关键资源位置。
+- MOV 必须在 Safari 中人工验收，记录 macOS/iOS、Safari 版本、实际 `.mov` 请求、透明边缘和播放行为；Chromium 结果不能替代该结论。
+- UA 模拟只验证格式选型逻辑，不能证明 Chrome 56、Android 9、iOS 12 或 iOS 13+ 真机解码兼容；需要“真机已验证”结论时必须使用对应真机或云真机。
+
 ## 审核链接
 
 - [新模板：自动选择格式](http://127.0.0.1:5173/src/pages/KJG_QAP_BD_v2_2026_video/index.html?channel=ng-preview&businessContentUuid=mock&fetchDataUrl=%2Fsrc%2Fshared%2Fcore%2Fmock%2FKJG_QAP_BD_v2.json&renderer=auto)
@@ -80,3 +86,11 @@ yarn dev --host 0.0.0.0
 ## 验收记录
 
 建议记录设备型号、系统版本、浏览器版本、实际 renderer、动作名称、结果和截图/录屏。任何透明边缘、位置、时长问题都应记录到具体资源及动作，例如 `BD_laki/wait.webm`。
+
+### 2026-08-25 Safari 桌面验收
+
+- 环境：macOS 26.6、Safari 26.6。
+- 强制 MOV：`renderer=mov`，页面报告 `{ action: "start", renderer: "mov", status: "video" }`，未降级到 PNG 图集。
+- 自动选择：`renderer=auto` 已人工验证选择 MOV。
+- 模板结果：人工确认模板运行正常。
+- 结论：当前 macOS Safari 环境的 HEVC alpha MOV 路径验收通过；其他系统与浏览器基线仍按真机验收矩阵分别验证。
