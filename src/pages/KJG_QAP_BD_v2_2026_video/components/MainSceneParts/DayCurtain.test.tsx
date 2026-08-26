@@ -17,7 +17,7 @@ afterEach(() => {
 });
 
 describe('DayCurtain raster resources', () => {
-  test('selects the generated open and close animations by phase', () => {
+  test('keeps the current curtain visible until the next phase is ready', () => {
     vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
     vi.useFakeTimers();
     window.history.replaceState({}, '', '/?renderer=webm');
@@ -32,6 +32,13 @@ describe('DayCurtain raster resources', () => {
     expect(container.querySelector('[data-testid="legacy-dragonbones"]')).toBeNull();
 
     act(() => root.render(<DayCurtain phase="closing" />));
+    const videos = [...container.querySelectorAll('video')];
+    expect(videos).toHaveLength(2);
+    expect(videos[0]?.src).toContain('/BD_open/start.webm');
+    expect(videos[1]?.src).toContain('/BD_close/start.webm');
+
+    act(() => videos[1]?.dispatchEvent(new Event('loadeddata')));
+    expect(container.querySelectorAll('video')).toHaveLength(1);
     expect(container.querySelector('video')?.src).toContain('/BD_close/start.webm');
 
     act(() => root.unmount());

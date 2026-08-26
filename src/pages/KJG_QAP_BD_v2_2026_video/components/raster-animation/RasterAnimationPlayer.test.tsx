@@ -20,6 +20,11 @@ const manifest = {
         { src: 'start-atlas-01.png', columns: 2, rows: 1, startFrame: 0, frameCount: 2 },
       ],
     },
+    end: {
+      frameCount: 1,
+      duration: 1 / 24,
+      still: 'end.png',
+    },
   },
 } as const;
 
@@ -27,15 +32,20 @@ const files = {
   'start.webm': '/start.webm',
   'start.mov': '/start.mov',
   'start-atlas-01.png': '/start-atlas-01.png',
+  'end.png': '/end.png',
 };
 
 let container: HTMLDivElement;
 let root: Root;
 let imageLoadCount: number;
 let drawImage: ReturnType<typeof vi.fn>;
+let autoLoadImages: boolean;
+let pendingImageLoads: Array<() => void>;
 
 beforeEach(() => {
   imageLoadCount = 0;
+  autoLoadImages = true;
+  pendingImageLoads = [];
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue();
   vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {});
@@ -52,7 +62,9 @@ beforeEach(() => {
       imageLoadCount += 1;
     }
     set src(_value: string) {
-      queueMicrotask(() => this.onload?.());
+      const load = () => this.onload?.();
+      if (autoLoadImages) queueMicrotask(load);
+      else pendingImageLoads.push(load);
     }
   }
   vi.stubGlobal('Image', LoadedImage);
@@ -139,6 +151,38 @@ describe('RasterAnimationPlayer', () => {
     });
 
     expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  test('keeps the current video visible until the next still frame is ready', async () => {
+    const Player = await loadPlayer();
+    expect(Player).not.toBeNull();
+    if (!Player) return;
+    autoLoadImages = false;
+
+    await act(async () => {
+      root.render(<Player manifest={manifest} files={files} action="start" renderer="webm" />);
+    });
+    const video = container.querySelector('video');
+    act(() => video?.dispatchEvent(new Event('loadeddata')));
+
+    await act(async () => {
+      root.render(<Player manifest={manifest} files={files} action="end" renderer="webm" />);
+      await Promise.resolve();
+    });
+
+    expect(container.querySelector('video')?.getAttribute('src')).toBe('/start.webm');
+    expect(container.querySelectorAll('canvas')).toHaveLength(1);
+
+    await act(async () => {
+      pendingImageLoads.shift()?.();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(container.querySelector('video')).toBeNull();
+    expect(container.querySelector('[data-raster-action="end"]')?.getAttribute('style')).not.toContain(
+      'visibility: hidden',
+    );
   });
 
   test('combines template origin with the asset anchor and loops video on request', async () => {

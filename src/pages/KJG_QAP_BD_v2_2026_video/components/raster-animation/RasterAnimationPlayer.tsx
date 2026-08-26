@@ -39,7 +39,11 @@ function getQueryRenderer(): RasterRendererPreference {
     : 'auto';
 }
 
-function selectInitialRenderer(preference: RasterRendererPreference): RasterRenderer {
+function selectInitialRenderer(
+  preference: RasterRendererPreference,
+  action?: RasterAction,
+): RasterRenderer {
+  if (action?.still) return 'atlas';
   if (typeof document === 'undefined' || typeof navigator === 'undefined') return 'atlas';
   const probe = document.createElement('video');
 
@@ -245,7 +249,7 @@ function AtlasCanvas({
   );
 }
 
-export default function RasterAnimationPlayer({
+function RasterAnimationLayer({
   manifest,
   files,
   action: actionName,
@@ -259,11 +263,12 @@ export default function RasterAnimationPlayer({
   onReady,
   onComplete,
   onError,
-}: RasterAnimationPlayerProps) {
+  hidden = false,
+}: RasterAnimationPlayerProps & { hidden?: boolean }) {
   const action = manifest.actions[actionName];
   const preference = renderer ?? getQueryRenderer();
   const [activeRenderer, setActiveRenderer] = useState<RasterRenderer>(() =>
-    selectInitialRenderer(preference),
+    selectInitialRenderer(preference, action),
   );
   const [status, setStatus] = useState<RasterStatus>(() =>
     activeRenderer === 'atlas' ? 'loading-atlas' : 'loading-video',
@@ -309,7 +314,7 @@ export default function RasterAnimationPlayer({
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
     }
-    const nextRenderer = selectInitialRenderer(preference);
+    const nextRenderer = selectInitialRenderer(preference, action);
     setActiveRenderer(nextRenderer);
     setStatus(nextRenderer === 'atlas' ? 'loading-atlas' : 'loading-video');
   }, [actionName, preference, restartKey]);
@@ -339,6 +344,7 @@ export default function RasterAnimationPlayer({
       height: manifest.canvas.height,
       pointerEvents: 'none',
       ...style,
+      visibility: hidden ? 'hidden' : style?.visibility,
     }),
     [
       manifest.anchor.x,
@@ -348,6 +354,7 @@ export default function RasterAnimationPlayer({
       origin.x,
       origin.y,
       style,
+      hidden,
     ],
   );
 
@@ -408,5 +415,66 @@ export default function RasterAnimationPlayer({
         />
       )}
     </div>
+  );
+}
+
+interface RasterRequest {
+  key: string;
+  manifest: RasterManifest;
+  files: Record<string, string>;
+  action: string;
+  restartKey?: number | string;
+}
+
+export default function RasterAnimationPlayer(props: RasterAnimationPlayerProps) {
+  const { manifest, files, action, restartKey, onReady, onComplete } = props;
+  const targetKey = JSON.stringify([manifest.asset, action]);
+  const target = useMemo<RasterRequest>(
+    () => ({ key: targetKey, manifest, files, action, restartKey }),
+    [action, files, manifest, restartKey, targetKey],
+  );
+  const [current, setCurrent] = useState<RasterRequest>(target);
+  const [pending, setPending] = useState<RasterRequest | null>(null);
+
+  useEffect(() => {
+    if (current.key === target.key) {
+      setPending(null);
+      return;
+    }
+    setPending(target);
+  }, [current.key, target]);
+
+  return (
+    <>
+      <RasterAnimationLayer
+        key={current.key}
+        {...props}
+        manifest={current.manifest}
+        files={current.files}
+        action={current.action}
+        restartKey={current.key === target.key ? restartKey : current.restartKey}
+        onReady={current.key === target.key ? onReady : undefined}
+        onComplete={current.key === target.key ? onComplete : undefined}
+      />
+      {pending ? (
+        <RasterAnimationLayer
+          key={pending.key}
+          {...props}
+          manifest={pending.manifest}
+          files={pending.files}
+          action={pending.action}
+          restartKey={pending.restartKey}
+          paused
+          hidden
+          onComplete={undefined}
+          onReady={() => {
+            if (pending.key !== target.key) return;
+            setCurrent(pending);
+            setPending(null);
+            onReady?.();
+          }}
+        />
+      ) : null}
+    </>
   );
 }
