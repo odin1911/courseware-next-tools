@@ -18,12 +18,12 @@ yarn dev --host 0.0.0.0
 
 ## 审核链接
 
-- [新模板：自动选择格式](http://127.0.0.1:5173/src/pages/KJG_QAP_BD_v2_2026_video/index.html?channel=ng-preview&businessContentUuid=mock&fetchDataUrl=%2Fsrc%2Fshared%2Fcore%2Fmock%2FKJG_QAP_BD_v2.json&renderer=auto)
+- [新模板：自动选择格式](http://127.0.0.1:5173/src/pages/KJG_QAP_BD_v2_2026_video/index.html?mock=true)
 - [原 DragonBones 样板：用于对比](http://127.0.0.1:5173/src/pages/KJG_QAP_BD_v2_2026/index.html?channel=ng-preview&businessContentUuid=mock&fetchDataUrl=%2Fsrc%2Fshared%2Fcore%2Fmock%2FKJG_QAP_BD_v2.json)
-- [强制 VP9 alpha WebM](http://127.0.0.1:5173/src/pages/KJG_QAP_BD_v2_2026_video/index.html?channel=ng-preview&businessContentUuid=mock&fetchDataUrl=%2Fsrc%2Fshared%2Fcore%2Fmock%2FKJG_QAP_BD_v2.json&renderer=webm)
-- [强制 HEVC alpha MOV：使用 Safari](http://127.0.0.1:5173/src/pages/KJG_QAP_BD_v2_2026_video/index.html?channel=ng-preview&businessContentUuid=mock&fetchDataUrl=%2Fsrc%2Fshared%2Fcore%2Fmock%2FKJG_QAP_BD_v2.json&renderer=mov)
-- [强制 PNG 图集 Canvas](http://127.0.0.1:5173/src/pages/KJG_QAP_BD_v2_2026_video/index.html?channel=ng-preview&businessContentUuid=mock&fetchDataUrl=%2Fsrc%2Fshared%2Fcore%2Fmock%2FKJG_QAP_BD_v2.json&renderer=atlas)
-- [模拟视频失败并主动降级 PNG](http://127.0.0.1:5173/src/pages/KJG_QAP_BD_v2_2026_video/index.html?channel=ng-preview&businessContentUuid=mock&fetchDataUrl=%2Fsrc%2Fshared%2Fcore%2Fmock%2FKJG_QAP_BD_v2.json&renderer=broken-video)
+- [强制 VP9 alpha WebM](http://127.0.0.1:5173/src/pages/KJG_QAP_BD_v2_2026_video/index.html?mock=true&renderer=webm)
+- [强制 HEVC alpha MOV：使用 Safari](http://127.0.0.1:5173/src/pages/KJG_QAP_BD_v2_2026_video/index.html?mock=true&renderer=mov)
+- [强制 PNG 图集 Canvas](http://127.0.0.1:5173/src/pages/KJG_QAP_BD_v2_2026_video/index.html?mock=true&renderer=atlas)
+- [模拟视频失败并主动降级 PNG](http://127.0.0.1:5173/src/pages/KJG_QAP_BD_v2_2026_video/index.html?mock=true&renderer=broken-video)
 
 ## 内容验收流程
 

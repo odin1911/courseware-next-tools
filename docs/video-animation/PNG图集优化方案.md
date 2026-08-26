@@ -42,7 +42,7 @@ SVG 不适合作为透明视频面向 iOS 12的自动降级格式。
 - `BD_laki/wait` 共146帧，只有25个精确唯一帧，可去重82.9%。
 - `BD_flash/start` 当前画布为890×632，按动作裁切后只需保留约18.7%的画布面积。
 
-当前 PNG 降级资源合计约26.69 MB，是三格式发布目录中最大的组成部分。详细原始统计参见 [视频动画资源体积统计](./src/pages/KJG_QAP_BD_v2_2026_video/video-animation-metrics.md)。
+当前 PNG 降级资源合计约26.69 MB，是三格式发布目录中最大的组成部分。详细原始统计参见 [视频动画资源体积统计](../../src/pages/KJG_QAP_BD_v2_2026_video/video-animation-metrics.md)。
 
 ## 3. 当前体积问题的原因
 
@@ -54,7 +54,7 @@ SVG 不适合作为透明视频面向 iOS 12的自动降级格式。
 - 图集使用固定大小槽位，无法利用每帧不同的透明边界。
 - 最后一页不足整行时仍可能保留空槽。
 
-现有画布和锚点规则参见 [视频生成流程](./tools/ai-animation/video-generation-pipeline.md)。
+现有画布和锚点规则参见 [视频生成流程](../../tools/ai-animation/video-generation-pipeline.md)。
 
 ## 4. 推荐的视频转 PNG 流程
 

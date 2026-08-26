@@ -1,6 +1,6 @@
 # dragonbones-tool 工具说明
 
-本文档只说明同级项目 `../courseware-next-tools/src/pages/dragonbones-tool` 的职责边界与使用方式。
+本文档说明当前 `dragonbones-tool` 页面目录的职责边界与使用方式。
 
 ## 定位
 
@@ -17,7 +17,7 @@
 
 ## 使用流程
 
-1. 把目标 zip 资源加入 `../courseware-next-tools/src/pages/dragonbones-tool`，并把卡片宽高设成正式页面中的真实宿主尺寸。
+1. 把目标 zip 资源加入当前页面的资源配置，并把卡片宽高设成正式页面中的真实宿主尺寸。
 2. 切到目标 armature 和 animation，点击“分析当前动作”。
 3. 读取工具页输出的 `最大区域` 与 `建议安全区`。
 4. 优先把 `left/top/right/bottom` 回写到页面本地动画宿主补偿，而不是先改共享 `DragonBonesPlayer`。
@@ -36,9 +36,9 @@
 
 源码依据：
 
-- `/Users/limin/demo/DragonBonesJS/DragonBones/src/dragonBones/armature/Slot.ts` 的 `display` 注释明确把 `slot.display = new yourEngine.TextField()` 作为替换显示对象示例。
-- `/Users/limin/demo/DragonBonesJS/Pixi/4.x/src/dragonBones/pixi/PixiSlot.ts` 在 `_replaceDisplay()` 中会把新显示对象加入 armature display、与旧显示对象交换层级并移除旧对象；工具页 slot 嵌字因此需要保留旧 display，关闭或切换目标时恢复。
-- `KJ_QA_PP_v2 Bubble` 卡片使用 `src/pages/KJ_QA_PP_v2_2026/assets/skeleton/PP_bubble_0.zip` 做同 canvas 嵌字验证。原模板不是对 `#ff00ff` 做色键透明化，而是在 `BubbleView` 初始化时取得 `text_area` slot，用默认 display 的宽高计算文本布局后执行 `mTextAreaSlot.display = this.textSprite`。因此工具页水泡卡片默认开启嵌字，并把目标设为 `slot:text_area`；E2E 先确认该 slot 替换后 canvas 不再出现洋红占位块，再读取蓝色文字像素确认文字已进入 Pixi 渲染树。
+- DragonBones `Slot.ts` 的 `display` 注释明确把 `slot.display = new yourEngine.TextField()` 作为替换显示对象示例。
+- Pixi 4.x 的 `PixiSlot.ts` 在 `_replaceDisplay()` 中会把新显示对象加入 armature display、与旧显示对象交换层级并移除旧对象；工具页 slot 嵌字因此需要保留旧 display，关闭或切换目标时恢复。
+- `KJ_QA_PP_v2 Bubble` 卡片使用当前目录的 `assets/fixtures/PP_bubble_0.zip` 做同 canvas 嵌字验证。原模板不是对 `#ff00ff` 做色键透明化，而是在 `BubbleView` 初始化时取得 `text_area` slot，用默认 display 的宽高计算文本布局后执行 `mTextAreaSlot.display = this.textSprite`。因此工具页水泡卡片默认开启嵌字，并把目标设为 `slot:text_area`；E2E 先确认该 slot 替换后 canvas 不再出现洋红占位块，再读取蓝色文字像素确认文字已进入 Pixi 渲染树。
 
 ## 已验证案例
 
