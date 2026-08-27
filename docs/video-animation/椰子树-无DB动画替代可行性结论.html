@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="zh-CN" data-report-layout="executive-brief">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="KJ_QAP_MW_v2 交互动画无 DragonBones 替代可行性说明。">
+  <title>KJ_QAP_MW_v2 交互动画无 DragonBones 替代可行性说明</title>
+  <style>
+    :root {
+      --ink: #0b1f33;
+      --ink-2: #16344f;
+      --paper: #f4f7fa;
+      --surface: #ffffff;
+      --blue: #2f5bea;
+      --blue-soft: #e9efff;
+      --teal: #0f8f83;
+      --teal-soft: #e6f6f3;
+      --amber: #d98a20;
+      --amber-soft: #fff4e3;
+      --red: #c55454;
+      --red-soft: #fff0ef;
+      --muted: #607286;
+      --line: #d8e1ea;
+      --shadow: 0 22px 60px rgba(17, 42, 67, .09);
+      --radius: 18px;
+      --content: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: linear-gradient(180deg, #fff 0, var(--paper) 680px, var(--paper) 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; }
+
+    .skip-link {
+      position: fixed;
+      left: 16px;
+      top: -80px;
+      z-index: 100;
+      padding: 10px 14px;
+      color: #fff;
+      background: var(--blue);
+      border-radius: 8px;
+      transition: top .2s ease;
+    }
+
+    .skip-link:focus { top: 16px; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+      background:
+        radial-gradient(circle at 82% 18%, rgba(47, 91, 234, .35), transparent 31%),
+        linear-gradient(128deg, #07192a 0%, #0b2439 58%, #0c3145 100%);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .24;
+      background-image:
+        linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px);
+      background-size: 52px 52px;
+      mask-image: linear-gradient(90deg, transparent, #000 55%, #000);
+      pointer-events: none;
+    }
+
+    .hero-inner,
+    .content,
+    .report-nav-inner {
+      width: min(calc(100% - 48px), var(--content));
+      margin-inline: auto;
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.06fr) minmax(420px, .94fr);
+      align-items: center;
+      gap: 72px;
+      min-height: 620px;
+      padding: 76px 0;
+    }
+
+    .eyebrow,
+    .board-label,
+    .section-index,
+    .card-label,
+    .detail-label {
+      font-family: "DIN Alternate", "Arial Narrow", "Roboto Condensed", sans-serif;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow {
+      margin: 0 0 18px;
+      color: #77b4ff;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .hero-objective {
+      max-width: 700px;
+      margin: 0;
+      color: #fff;
+      font-size: clamp(28px, 3.4vw, 42px);
+      font-weight: 650;
+      line-height: 1.42;
+      letter-spacing: -.03em;
+    }
+
+    .hero-summary {
+      max-width: 650px;
+      margin: 28px 0 0;
+      color: rgba(255,255,255,.74);
+      font-size: 18px;
+      line-height: 1.8;
+    }
+
+    .hero-summary strong { color: #fff; }
+
+    .responsibility-board {
+      position: relative;
+      padding: 28px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 24px;
+      background: rgba(4, 22, 37, .48);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .25);
+      backdrop-filter: blur(8px);
+    }
+
+    .responsibility-board::after {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border: 1px solid rgba(255,255,255,.05);
+      border-radius: 16px;
+      pointer-events: none;
+    }
+
+    .board-label {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 16px;
+      color: rgba(255,255,255,.48);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .board-source {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.06);
+      font-weight: 700;
+    }
+
+    .board-source small {
+      color: rgba(255,255,255,.46);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+    }
+
+    .responsibility-list {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 12px;
+      margin-top: 30px;
+      padding-left: 32px;
+    }
+
+    .responsibility-list::before {
+      content: "";
+      position: absolute;
+      left: 11px;
+      top: -30px;
+      bottom: 24px;
+      width: 1px;
+      background: rgba(255,255,255,.27);
+    }
+
+    .responsibility {
+      --item-color: var(--blue);
+      position: relative;
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      align-items: center;
+      gap: 14px;
+      min-height: 68px;
+      padding: 10px 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      background: rgba(255,255,255,.045);
+    }
+
+    .responsibility::before {
+      content: "";
+      position: absolute;
+      left: -21px;
+      top: 50%;
+      width: 21px;
+      height: 1px;
+      background: rgba(255,255,255,.27);
+    }
+
+    .responsibility::after {
+      content: "";
+      position: absolute;
+      left: -25px;
+      top: calc(50% - 4px);
+      width: 8px;
+      height: 8px;
+      border: 2px solid #0b2439;
+      border-radius: 50%;
+      background: var(--item-color);
+    }
+
+    .responsibility.dom { --item-color: var(--teal); }
+    .responsibility.video { --item-color: var(--amber); }
+
+    .responsibility strong {
+      color: var(--item-color);
+      font-family: "DIN Alternate", "Arial Narrow", sans-serif;
+      font-size: 17px;
+      letter-spacing: .04em;
+    }
+
+    .responsibility span {
+      color: rgba(255,255,255,.78);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .report-nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(14px);
+    }
+
+    .report-nav-inner {
+      display: flex;
+      align-items: center;
+      min-height: 60px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .report-nav-inner::-webkit-scrollbar { display: none; }
+
+    .report-nav a {
+      flex: 0 0 auto;
+      padding: 19px 14px 17px;
+      color: var(--muted);
+      border-bottom: 2px solid transparent;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .report-nav a:first-child { padding-left: 0; }
+
+    .report-nav a:hover,
+    .report-nav a:focus-visible {
+      color: var(--blue);
+      border-bottom-color: var(--blue);
+      outline: none;
+    }
+
+    .content { padding: 86px 0 120px; }
+
+    .report-relation {
+      margin: 0 0 82px;
+      padding: 16px 20px;
+      color: var(--muted);
+      border-left: 3px solid var(--blue);
+      background: #fff;
+      box-shadow: var(--shadow);
+      font-size: 14px;
+    }
+
+    .report-relation a {
+      color: var(--blue);
+      font-weight: 650;
+      text-underline-offset: 3px;
+    }
+
+    .report-section {
+      display: grid;
+      grid-template-columns: 160px minmax(0, 1fr);
+      gap: 50px;
+      padding: 86px 0;
+      border-top: 1px solid var(--line);
+      scroll-margin-top: 62px;
+    }
+
+    .report-section:first-of-type { border-top: 0; }
+
+    .section-index {
+      position: sticky;
+      top: 94px;
+      align-self: start;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .section-index span {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--line);
+      font-size: 42px;
+      line-height: 1;
+      letter-spacing: -.05em;
+    }
+
+    .section-body { min-width: 0; }
+
+    h2 {
+      margin: 0 0 28px;
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1.18;
+      letter-spacing: -.035em;
+    }
+
+    h3 {
+      margin: 0 0 12px;
+      font-size: 20px;
+      line-height: 1.35;
+      letter-spacing: -.015em;
+    }
+
+    p { margin: 0 0 18px; }
+
+    .lead {
+      max-width: 850px;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .goal-grid,
+    .solution-grid,
+    .capability-grid {
+      display: grid;
+      gap: 18px;
+      margin-top: 34px;
+    }
+
+    .goal-grid { grid-template-columns: repeat(2, 1fr); }
+    .solution-grid { grid-template-columns: repeat(2, 1fr); }
+    .capability-grid { grid-template-columns: repeat(3, 1fr); }
+
+    .goal-card,
+    .solution-card,
+    .capability {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: 0 12px 34px rgba(17,42,67,.05);
+    }
+
+    .card-label,
+    .detail-label {
+      display: block;
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .goal-card strong,
+    .capability strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--ink);
+      font-size: 17px;
+    }
+
+    .goal-card p,
+    .solution-card p,
+    .capability span {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .verdict {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(34px, 5vw, 58px);
+      color: #fff;
+      border-radius: 26px;
+      background: var(--ink);
+      box-shadow: var(--shadow);
+    }
+
+    .verdict::after {
+      content: "STATIC  /  DOM  /  VIDEO";
+      position: absolute;
+      right: -18px;
+      bottom: -20px;
+      color: rgba(255,255,255,.045);
+      font-family: "DIN Alternate", "Arial Narrow", sans-serif;
+      font-size: clamp(48px, 8vw, 98px);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .verdict h2,
+    .verdict p { position: relative; z-index: 1; max-width: 830px; }
+    .verdict h2 { color: #fff; }
+    .verdict p { color: rgba(255,255,255,.72); font-size: 17px; }
+    .verdict p:last-child { margin-bottom: 0; }
+
+    .status-note {
+      margin-top: 26px;
+      padding: 16px 18px;
+      color: #835412;
+      border-left: 3px solid var(--amber);
+      background: var(--amber-soft);
+      font-size: 14px;
+    }
+
+    .solution-card {
+      position: relative;
+      overflow: hidden;
+      padding-top: 30px;
+    }
+
+    .solution-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 5px;
+      background: var(--blue);
+    }
+
+    .solution-card.dom::before { background: var(--teal); }
+    .solution-card.video::before { background: var(--amber); }
+
+    .solution-card ul,
+    .plain-list {
+      margin: 18px 0 0;
+      padding-left: 20px;
+    }
+
+    .solution-card li,
+    .plain-list li { margin: 8px 0; }
+
+    .change-grid,
+    .boundary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+      margin-top: 34px;
+    }
+
+    .change-panel,
+    .boundary-panel {
+      padding: 28px;
+      border-radius: var(--radius);
+    }
+
+    .change-panel.remove {
+      border: 1px solid #efc8c5;
+      background: var(--red-soft);
+    }
+
+    .change-panel.reduce {
+      border: 1px solid #f0d5a7;
+      background: var(--amber-soft);
+    }
+
+    .change-panel ol { margin: 18px 0 0; padding-left: 22px; }
+    .change-panel li { margin: 14px 0; }
+    .change-panel strong { display: block; color: var(--ink); }
+    .change-panel span { color: var(--muted); font-size: 14px; }
+
+    .capability {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      min-height: 108px;
+    }
+
+    .capability::before {
+      content: "";
+      flex: 0 0 auto;
+      width: 9px;
+      height: 9px;
+      margin-top: 8px;
+      border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 0 5px var(--teal-soft);
+    }
+
+    .boundary-panel.current {
+      border: 1px solid #f0d5a7;
+      background: var(--amber-soft);
+    }
+
+    .boundary-panel.details {
+      border: 1px solid #bfe4de;
+      background: var(--teal-soft);
+    }
+
+    footer {
+      padding: 26px 0 48px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 44px; }
+      .responsibility-board { max-width: 680px; }
+      .report-section { grid-template-columns: 110px minmax(0, 1fr); gap: 30px; }
+      .capability-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 720px) {
+      .hero-inner,
+      .content,
+      .report-nav-inner { width: min(calc(100% - 32px), var(--content)); }
+      .hero-grid { min-height: 0; padding: 58px 0 48px; }
+      .hero-objective { font-size: 28px; }
+      .hero-summary { font-size: 16px; }
+      .responsibility-board { padding: 20px; }
+      .responsibility { grid-template-columns: 62px 1fr; }
+      .content { padding-top: 58px; }
+      .report-relation { margin-bottom: 50px; }
+      .report-section { display: block; padding: 60px 0; }
+      .section-index { position: static; margin-bottom: 22px; }
+      .section-index span { display: inline; margin-right: 8px; font-size: 24px; }
+      .goal-grid,
+      .solution-grid,
+      .capability-grid,
+      .change-grid,
+      .boundary-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; }
+    }
+
+    @media print {
+      :root { --paper: #fff; --shadow: none; }
+      body { background: #fff; font-size: 11pt; }
+      .hero { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .report-nav { display: none; }
+      .hero-grid { min-height: auto; padding: 44px 0; }
+      .report-section { display: block; padding: 36px 0; break-inside: avoid-page; }
+      .section-index { position: static; margin-bottom: 12px; }
+      .goal-card, .solution-card, .capability, .change-panel, .boundary-panel { break-inside: avoid; box-shadow: none; }
+      a { text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳至报告正文</a>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">交互动画替代说明</p>
+          <p class="hero-objective">说明包含动态文本、独立点击和拖拽等能力的动画，如何在本模板中移除 DragonBones 依赖。</p>
+          <p class="hero-summary">
+            交互部分改用<strong>静态素材和 DOM 节点</strong>实现，纯展示的爆炸反馈使用 AI 视频。当前结论基于职责和流程分析，尚未进行 DEMO 验证。
+          </p>
+        </div>
+
+        <div class="responsibility-board" aria-label="交互动画替代职责分配">
+          <p class="board-label">替代职责分配</p>
+          <div class="board-source">
+            <span>DragonBones 动画</span>
+            <small>按职责拆分</small>
+          </div>
+          <div class="responsibility-list">
+            <div class="responsibility">
+              <strong>静态</strong>
+              <span>椰子树画面<br>不带椰子的静态树图</span>
+            </div>
+            <div class="responsibility dom">
+              <strong>DOM</strong>
+              <span>独立椰子节点<br>动态文字、点击、掉落与拖拽</span>
+            </div>
+            <div class="responsibility video">
+              <strong>视频</strong>
+              <span>爆炸视觉反馈<br>WebM、MOV 和 PNG 图集</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="report-nav" aria-label="报告章节">
+    <div class="report-nav-inner">
+      <a href="#section-1">分析目标</a>
+      <a href="#section-2">可行性结论</a>
+      <a href="#section-3">替代方案</a>
+      <a href="#section-4">删除与降级</a>
+      <a href="#section-5">保留能力</a>
+      <a href="#section-6">方案边界</a>
+    </div>
+  </nav>
+
+  <main id="main" class="content">
+    <p class="report-relation">
+      本文是
+      <a href="./视频动画替代功能调研报告.html">视频动画替代功能可行性分析报告</a>
+      的补充，用于说明交互动画的无 DragonBones 替代方案。
+    </p>
+
+    <section id="section-1" class="report-section">
+      <div class="section-index"><span>01</span>Purpose</div>
+      <div class="section-body">
+        <p class="eyebrow">分析目标</p>
+        <h2>在保留核心玩法的前提下，移除本模板的 DragonBones 依赖</h2>
+        <div class="goal-grid">
+          <div class="goal-card">
+            <span class="card-label">01</span>
+            <strong>停止手工制作</strong>
+            <p>后续不再手工制作 DragonBones 动画。</p>
+          </div>
+          <div class="goal-card">
+            <span class="card-label">02</span>
+            <strong>移除运行时依赖</strong>
+            <p>本模板最终实现不依赖 DragonBones 资源和运行时。</p>
+          </div>
+          <div class="goal-card">
+            <span class="card-label">03</span>
+            <strong>选择性使用 AI 视频</strong>
+            <p>仅在不参与交互的纯展示场景中使用视频。</p>
+          </div>
+          <div class="goal-card">
+            <span class="card-label">04</span>
+            <strong>明确效果取舍</strong>
+            <p>说明无法等价保留、需要删除或降级的动画效果。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-2" class="report-section">
+      <div class="section-index"><span>02</span>Conclusion</div>
+      <div class="section-body">
+        <div class="verdict">
+          <p class="eyebrow">可行性结论</p>
+          <h2>方案分析可行，但不能用 AI 视频等价替换全部动画</h2>
+          <p>椰子树和椰子同时承担动态文字、独立点击、位置变化及拖拽等交互职责。视频只能提供合成后的画面，无法直接提供独立椰子节点及其交互能力。</p>
+          <p>因此，树与椰子的交互部分改为静态资源加 DOM 节点，AI 视频用于爆炸等不参与交互的纯展示动画。</p>
+        </div>
+        <p class="status-note">该方案尚未进行 DEMO 验证，具体交互效果需要在正式实现阶段确认。</p>
+      </div>
+    </section>
+
+    <section id="section-3" class="report-section">
+      <div class="section-index"><span>03</span>Solution</div>
+      <div class="section-body">
+        <p class="eyebrow">替代方案</p>
+        <h2>按动画承担的职责分别使用静态素材、DOM 和视频</h2>
+        <div class="solution-grid">
+          <article class="solution-card">
+            <span class="card-label">Static</span>
+            <h3>椰子树</h3>
+            <ul>
+              <li>正式实现前制作不带椰子的静态树图。</li>
+              <li>使用静态图片展示椰子树，不再播放树的抖动动画。</li>
+              <li>六颗椰子的初始位置通过独立布局工具配置。</li>
+              <li>更换树资源时，需要在布局工具中重新完成位置对齐。</li>
+            </ul>
+          </article>
+
+          <article class="solution-card dom">
+            <span class="card-label">DOM</span>
+            <h3>树上椰子</h3>
+            <ul>
+              <li>正式实现前制作透明背景的独立椰子图。</li>
+              <li>六颗椰子使用独立 DOM 节点展示，并按照布局工具提供的位置放置在树上。</li>
+              <li>运行时显示椰子文字，保留独立点击、音频和显隐能力。</li>
+            </ul>
+          </article>
+
+          <article class="solution-card dom">
+            <span class="card-label">DOM Motion</span>
+            <h3>椰子掉落与拖拽</h3>
+            <ul>
+              <li>不使用 AI 视频表现椰子掉落。</li>
+              <li>直接移动当前椰子 DOM 节点完成掉落效果。</li>
+              <li>掉落完成后继续使用同一节点进行拖拽、命中判断和错误返回。</li>
+            </ul>
+          </article>
+
+          <article class="solution-card video">
+            <span class="card-label">AI Video</span>
+            <h3>爆炸反馈</h3>
+            <ul>
+              <li>爆炸只承担视觉反馈，不包含动态文字、点击或拖拽行为。</li>
+              <li>使用 AI 生成视频替换。</li>
+              <li>沿用主报告中的 WebM、MOV 和 PNG 图集三格式分流方案。</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-4" class="report-section">
+      <div class="section-index"><span>04</span>Trade-offs</div>
+      <div class="section-body">
+        <p class="eyebrow">删除与降级</p>
+        <h2>移除 DragonBones 后，核心玩法保留，部分骨骼视觉效果取消或简化</h2>
+        <div class="change-grid">
+          <div class="change-panel remove">
+            <span class="detail-label">Remove</span>
+            <h3>删除的内容</h3>
+            <ol>
+              <li><strong>树的抖动动作</strong><span>删除树干、树叶整体抖动的 `shake` 动画。</span></li>
+              <li><strong>椰子与树枝的骨骼联动</strong><span>不再保留六颗椰子跟随树枝产生的独立位移和旋转。</span></li>
+              <li><strong>复杂的前后遮挡</strong><span>DOM 椰子使用固定显示层级。</span></li>
+              <li><strong>骨骼节点位置跟踪</strong><span>不再依赖动画运行时提供节点位置。</span></li>
+            </ol>
+          </div>
+
+          <div class="change-panel reduce">
+            <span class="detail-label">Reduce</span>
+            <h3>降级的内容</h3>
+            <ol>
+              <li><strong>六套独立掉落动画</strong><span>`fall_0` 至 `fall_5` 降级为 DOM 节点的通用掉落动画。</span></li>
+              <li><strong>掉落过程中的复杂变化</strong><span>不再要求复现复杂弧线、独立旋转、缩放和树枝脱离效果。</span></li>
+              <li><strong>骨骼坐标交接</strong><span>改为由同一 DOM 椰子完成掉落和后续拖拽。</span></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-5" class="report-section">
+      <div class="section-index"><span>05</span>Capabilities</div>
+      <div class="section-body">
+        <p class="eyebrow">预计可保留的核心能力</p>
+        <h2>核心玩法由普通页面节点和业务逻辑继续承担</h2>
+        <div class="capability-grid">
+          <div class="capability"><div><strong>固定布局</strong><span>通过布局工具配置六颗椰子的固定位置。</span></div></div>
+          <div class="capability"><div><strong>动态文字</strong><span>椰子上显示动态字母或单词。</span></div></div>
+          <div class="capability"><div><strong>题目分配</strong><span>题目与椰子位置的运行时分配。</span></div></div>
+          <div class="capability"><div><strong>独立点击</strong><span>单独点击椰子播放对应音频。</span></div></div>
+          <div class="capability"><div><strong>掉落与拖拽</strong><span>椰子掉落后继续用于拖拽。</span></div></div>
+          <div class="capability"><div><strong>命中判断</strong><span>保留正确和错误命中判断。</span></div></div>
+          <div class="capability"><div><strong>错误返回</strong><span>错误后返回原位。</span></div></div>
+          <div class="capability"><div><strong>正确隐藏</strong><span>正确后隐藏对应椰子。</span></div></div>
+          <div class="capability"><div><strong>反馈与完成</strong><span>保留爆炸反馈和完成状态。</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="section-6" class="report-section">
+      <div class="section-index"><span>06</span>Boundaries</div>
+      <div class="section-body">
+        <p class="eyebrow">方案边界</p>
+        <h2>当前只判断方案可行性，交互效果和动画参数在正式实现阶段确定</h2>
+        <div class="boundary-grid">
+          <div class="boundary-panel current">
+            <span class="detail-label">Current status</span>
+            <h3>尚未完成 DEMO 验证</h3>
+            <p>当前结论基于现有动画职责和交互流程分析，不表示 DOM 替代方案已经实现或验收。</p>
+          </div>
+          <div class="boundary-panel details">
+            <span class="detail-label">Implementation details</span>
+            <h3>正式实现阶段确定</h3>
+            <ul class="plain-list">
+              <li>点击后的具体交互顺序。</li>
+              <li>DOM 掉落动画的轨迹、时长和缓动参数。</li>
+              <li>动画期间的交互冲突处理。</li>
+              <li>爆炸视频的画面尺寸、帧率和具体视觉效果。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="content" style="padding:0">KJ_QAP_MW_v2 交互动画无 DragonBones 替代可行性说明</div>
+  </footer>
+</body>
+</html>
