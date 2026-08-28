@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta name="description" content="KJ_QAP_MW_v2 交互动画无 DragonBones 替代可行性说明。">
-  <title>KJ_QAP_MW_v2 交互动画无 DragonBones 替代可行性说明</title>
+  <meta name="description" content="KJ_QAP_MW_v2 交互动画替代可行性说明。">
+  <title>KJ_QAP_MW_v2 交互动画替代可行性说明</title>
   <style>
     :root {
       --ink: #0b1f33;
@@ -136,6 +136,8 @@
       line-height: 1.8;
     }
 
+    .hero-summary span { display: block; }
+
     .hero-summary strong { color: #fff; }
 
     .responsibility-board {
@@ -160,31 +162,10 @@
     .board-label {
       position: relative;
       z-index: 1;
-      margin: 0 0 16px;
-      color: rgba(255,255,255,.48);
-      font-size: 10px;
+      margin: 0 0 18px;
+      color: #77b4ff;
+      font-size: 12px;
       font-weight: 800;
-    }
-
-    .board-source {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 14px 16px;
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 12px;
-      background: rgba(255,255,255,.06);
-      font-weight: 700;
-    }
-
-    .board-source small {
-      color: rgba(255,255,255,.46);
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .08em;
     }
 
     .responsibility-list {
@@ -192,7 +173,7 @@
       z-index: 1;
       display: grid;
       gap: 12px;
-      margin-top: 30px;
+      margin-top: 0;
       padding-left: 32px;
     }
 
@@ -200,7 +181,7 @@
       content: "";
       position: absolute;
       left: 11px;
-      top: -30px;
+      top: 24px;
       bottom: 24px;
       width: 1px;
       background: rgba(255,255,255,.27);
@@ -298,22 +279,6 @@
 
     .content { padding: 86px 0 120px; }
 
-    .report-relation {
-      margin: 0 0 82px;
-      padding: 16px 20px;
-      color: var(--muted);
-      border-left: 3px solid var(--blue);
-      background: #fff;
-      box-shadow: var(--shadow);
-      font-size: 14px;
-    }
-
-    .report-relation a {
-      color: var(--blue);
-      font-weight: 650;
-      text-underline-offset: 3px;
-    }
-
     .report-section {
       display: grid;
       grid-template-columns: 160px minmax(0, 1fr);
@@ -367,7 +332,56 @@
       font-size: 18px;
     }
 
-    .goal-grid,
+    .responsibility-table-wrap {
+      overflow: hidden;
+      margin-top: 34px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: 0 12px 34px rgba(17,42,67,.05);
+    }
+
+    .responsibility-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .responsibility-table th,
+    .responsibility-table td {
+      padding: 17px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+    }
+
+    .responsibility-table th {
+      color: var(--muted);
+      background: #f8fafc;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .responsibility-table th:nth-child(1) { width: 14%; }
+    .responsibility-table th:nth-child(2) { width: 18%; }
+    .responsibility-table th:nth-child(3) { width: 19%; }
+    .responsibility-table th:nth-child(4) { width: 30%; }
+    .responsibility-table th:nth-child(5) { width: 19%; }
+    .responsibility-table tbody tr:last-child td { border-bottom: 0; }
+    .responsibility-table td:first-child { color: var(--ink); font-weight: 700; }
+
+    .responsibility-note {
+      margin: 18px 0 0;
+      padding: 14px 18px;
+      color: var(--muted);
+      border-left: 3px solid var(--teal);
+      background: var(--teal-soft);
+      font-size: 14px;
+    }
+
     .solution-grid,
     .capability-grid {
       display: grid;
@@ -375,11 +389,9 @@
       margin-top: 34px;
     }
 
-    .goal-grid { grid-template-columns: repeat(2, 1fr); }
     .solution-grid { grid-template-columns: repeat(2, 1fr); }
     .capability-grid { grid-template-columns: repeat(3, 1fr); }
 
-    .goal-card,
     .solution-card,
     .capability {
       padding: 24px;
@@ -398,7 +410,6 @@
       font-weight: 800;
     }
 
-    .goal-card strong,
     .capability strong {
       display: block;
       margin-bottom: 8px;
@@ -406,7 +417,6 @@
       font-size: 17px;
     }
 
-    .goal-card p,
     .solution-card p,
     .capability span {
       margin: 0;
@@ -425,7 +435,7 @@
     }
 
     .verdict::after {
-      content: "STATIC  /  DOM  /  VIDEO";
+      content: "素材  /  交互  /  视频";
       position: absolute;
       right: -18px;
       bottom: -20px;
@@ -441,15 +451,6 @@
     .verdict h2 { color: #fff; }
     .verdict p { color: rgba(255,255,255,.72); font-size: 17px; }
     .verdict p:last-child { margin-bottom: 0; }
-
-    .status-note {
-      margin-top: 26px;
-      padding: 16px 18px;
-      color: #835412;
-      border-left: 3px solid var(--amber);
-      background: var(--amber-soft);
-      font-size: 14px;
-    }
 
     .solution-card {
       position: relative;
@@ -558,15 +559,59 @@
       .responsibility-board { padding: 20px; }
       .responsibility { grid-template-columns: 62px 1fr; }
       .content { padding-top: 58px; }
-      .report-relation { margin-bottom: 50px; }
       .report-section { display: block; padding: 60px 0; }
       .section-index { position: static; margin-bottom: 22px; }
       .section-index span { display: inline; margin-right: 8px; font-size: 24px; }
-      .goal-grid,
       .solution-grid,
       .capability-grid,
       .change-grid,
       .boundary-grid { grid-template-columns: 1fr; }
+
+      .responsibility-table-wrap {
+        overflow: visible;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      .responsibility-table,
+      .responsibility-table tbody,
+      .responsibility-table tr,
+      .responsibility-table td { display: block; width: 100%; }
+
+      .responsibility-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+      }
+
+      .responsibility-table tr {
+        margin-bottom: 16px;
+        padding: 16px 18px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #fff;
+      }
+
+      .responsibility-table td {
+        position: relative;
+        min-height: 34px;
+        padding: 5px 0 5px 92px;
+        border: 0;
+      }
+
+      .responsibility-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        width: 80px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -582,7 +627,7 @@
       .hero-grid { min-height: auto; padding: 44px 0; }
       .report-section { display: block; padding: 36px 0; break-inside: avoid-page; }
       .section-index { position: static; margin-bottom: 12px; }
-      .goal-card, .solution-card, .capability, .change-panel, .boundary-panel { break-inside: avoid; box-shadow: none; }
+      .solution-card, .capability, .change-panel, .boundary-panel { break-inside: avoid; box-shadow: none; }
       a { text-decoration: none; }
     }
   </style>
@@ -594,31 +639,29 @@
     <div class="hero-inner">
       <div class="hero-grid">
         <div>
-          <p class="eyebrow">交互动画替代说明</p>
-          <p class="hero-objective">说明包含动态文本、独立点击和拖拽等能力的动画，如何在本模板中移除 DragonBones 依赖。</p>
+          <p class="eyebrow">交互动画替代结论</p>
+          <p class="hero-objective">需要根据元素是否参与交互拆分实现</p>
           <p class="hero-summary">
-            交互部分改用<strong>静态素材和 DOM 节点</strong>实现，纯展示的爆炸反馈使用 AI 视频。当前结论基于职责和流程分析，尚未进行 DEMO 验证。
+            <span>本模板不能使用一段视频整体替换，需要根据元素是否参与交互拆分实现。</span>
+            <span>展示效果使用视频；树和椰子使用独立素材，由配置提供布局，由代码实现动态内容和交互。</span>
+            <span>当前树、椰子、掉落和反馈集中在同一套动画资源中，实施前需要先拆分为静态树、独立椰子和展示动画，部分原有效果将删除或简化。</span>
           </p>
         </div>
 
-        <div class="responsibility-board" aria-label="交互动画替代职责分配">
-          <p class="board-label">替代职责分配</p>
-          <div class="board-source">
-            <span>DragonBones 动画</span>
-            <small>按职责拆分</small>
-          </div>
+        <div class="responsibility-board" aria-label="交互动画实现方式">
+          <p class="board-label">实现方式</p>
           <div class="responsibility-list">
             <div class="responsibility">
-              <strong>静态</strong>
-              <span>椰子树画面<br>不带椰子的静态树图</span>
+              <strong>视频</strong>
+              <span>不参与交互的展示效果</span>
             </div>
             <div class="responsibility dom">
-              <strong>DOM</strong>
-              <span>独立椰子节点<br>动态文字、点击、掉落与拖拽</span>
+              <strong>配置</strong>
+              <span>资源、位置和尺寸</span>
             </div>
             <div class="responsibility video">
-              <strong>视频</strong>
-              <span>爆炸视觉反馈<br>WebM、MOV 和 PNG 图集</span>
+              <strong>代码</strong>
+              <span>动态内容、点击、掉落、拖拽和流程控制</span>
             </div>
           </div>
         </div>
@@ -628,129 +671,108 @@
 
   <nav class="report-nav" aria-label="报告章节">
     <div class="report-nav-inner">
-      <a href="#section-1">分析目标</a>
-      <a href="#section-2">可行性结论</a>
-      <a href="#section-3">替代方案</a>
-      <a href="#section-4">删除与降级</a>
-      <a href="#section-5">保留能力</a>
-      <a href="#section-6">方案边界</a>
+      <a href="#section-1">可行性结论</a>
+      <a href="#section-2">职责拆分</a>
+      <a href="#section-3">删除与降级</a>
+      <a href="#section-4">保留能力</a>
+      <a href="#section-5">方案边界</a>
     </div>
   </nav>
 
   <main id="main" class="content">
-    <p class="report-relation">
-      本文是
-      <a href="./视频动画替代功能调研报告.html">视频动画替代功能可行性分析报告</a>
-      的补充，用于说明交互动画的无 DragonBones 替代方案。
-    </p>
-
     <section id="section-1" class="report-section">
-      <div class="section-index"><span>01</span>Purpose</div>
+      <div class="section-index"><span>01</span>Conclusion</div>
       <div class="section-body">
-        <p class="eyebrow">分析目标</p>
-        <h2>在保留核心玩法的前提下，移除本模板的 DragonBones 依赖</h2>
-        <div class="goal-grid">
-          <div class="goal-card">
-            <span class="card-label">01</span>
-            <strong>停止手工制作</strong>
-            <p>后续不再手工制作 DragonBones 动画。</p>
-          </div>
-          <div class="goal-card">
-            <span class="card-label">02</span>
-            <strong>移除运行时依赖</strong>
-            <p>本模板最终实现不依赖 DragonBones 资源和运行时。</p>
-          </div>
-          <div class="goal-card">
-            <span class="card-label">03</span>
-            <strong>选择性使用 AI 视频</strong>
-            <p>仅在不参与交互的纯展示场景中使用视频。</p>
-          </div>
-          <div class="goal-card">
-            <span class="card-label">04</span>
-            <strong>明确效果取舍</strong>
-            <p>说明无法等价保留、需要删除或降级的动画效果。</p>
-          </div>
+        <div class="verdict">
+          <p class="eyebrow">可行性结论</p>
+          <h2>保留核心玩法可行，但不能将整个交互动画直接替换成一段视频</h2>
+          <p>不参与交互的展示效果可以使用视频；需要显示动态内容或参与点击、掉落、拖拽的元素，应使用独立素材。</p>
+          <p>独立素材由配置提供资源和布局信息，由代码实现动态内容、交互和流程状态。</p>
         </div>
       </div>
     </section>
 
     <section id="section-2" class="report-section">
-      <div class="section-index"><span>02</span>Conclusion</div>
+      <div class="section-index"><span>02</span>Solution</div>
       <div class="section-body">
-        <div class="verdict">
-          <p class="eyebrow">可行性结论</p>
-          <h2>方案分析可行，但不能用 AI 视频等价替换全部动画</h2>
-          <p>椰子树和椰子同时承担动态文字、独立点击、位置变化及拖拽等交互职责。视频只能提供合成后的画面，无法直接提供独立椰子节点及其交互能力。</p>
-          <p>因此，树与椰子的交互部分改为静态资源加 DOM 节点，AI 视频用于爆炸等不参与交互的纯展示动画。</p>
+        <p class="eyebrow">实现职责拆分</p>
+        <h2>资源负责展示，配置负责布局，代码负责交互和流程</h2>
+        <p class="lead">静态图片和视频都属于资源选择；配置记录资源、位置和尺寸；代码处理动态内容、交互和流程状态。</p>
+        <div class="responsibility-table-wrap">
+          <table class="responsibility-table">
+            <thead>
+              <tr>
+                <th scope="col">模板内容</th>
+                <th scope="col">使用的资源</th>
+                <th scope="col">配置负责</th>
+                <th scope="col">代码负责</th>
+                <th scope="col">效果变化</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="模板内容">椰子树</td>
+                <td data-label="使用的资源">不带椰子的静态树图</td>
+                <td data-label="配置负责">树资源及其显示区域</td>
+                <td data-label="代码负责">点击树后启动下一颗椰子的掉落流程</td>
+                <td data-label="效果变化">不再保留树的抖动动画</td>
+              </tr>
+              <tr>
+                <td data-label="模板内容">树上椰子</td>
+                <td data-label="使用的资源">透明背景的独立椰子图</td>
+                <td data-label="配置负责">六颗椰子的固定位置和尺寸</td>
+                <td data-label="代码负责">根据题目分配位置，显示动态文字，控制独立音频和显隐</td>
+                <td data-label="效果变化">不再从原动画中读取椰子位置</td>
+              </tr>
+              <tr>
+                <td data-label="模板内容">椰子掉落和拖拽</td>
+                <td data-label="使用的资源">继续使用同一个椰子元素</td>
+                <td data-label="配置负责">使用已配置的树上位置作为掉落起点</td>
+                <td data-label="代码负责">掉落、拖拽、结果判断、错误返回、正确隐藏及进入下一题</td>
+                <td data-label="效果变化">六套复杂掉落效果简化为代码控制的掉落</td>
+              </tr>
+              <tr>
+                <td data-label="模板内容">爆炸反馈</td>
+                <td data-label="使用的资源">沿用主报告的三种透明媒体资源</td>
+                <td data-label="配置负责">媒体资源、显示尺寸及相对椰子的位置</td>
+                <td data-label="代码负责">答案正确时定位并触发播放，播放完成后继续流程</td>
+                <td data-label="效果变化">保留展示性的爆炸效果</td>
+              </tr>
+              <tr>
+                <td data-label="模板内容">完成单词后的中央预览</td>
+                <td data-label="使用的资源">根据最终效果使用视频或静态图片</td>
+                <td data-label="配置负责">题目资源关系和显示区域</td>
+                <td data-label="代码负责">点击触发、音频播放、显示和关闭</td>
+                <td data-label="效果变化">需要确认保留动态效果还是使用静态图片</td>
+              </tr>
+              <tr>
+                <td data-label="模板内容">答案区域</td>
+                <td data-label="使用的资源">现有界面素材和题目内容</td>
+                <td data-label="配置负责">不新增动画配置</td>
+                <td data-label="代码负责">文字布局、目标判断、答案显示和完成状态</td>
+                <td data-label="效果变化">不使用视频</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <p class="status-note">该方案尚未进行 DEMO 验证，具体交互效果需要在正式实现阶段确认。</p>
+        <p class="responsibility-note">题目与六颗椰子的对应关系、掉落顺序以及答题状态仍由代码生成和管理，不写入固定配置。</p>
       </div>
     </section>
 
     <section id="section-3" class="report-section">
-      <div class="section-index"><span>03</span>Solution</div>
-      <div class="section-body">
-        <p class="eyebrow">替代方案</p>
-        <h2>按动画承担的职责分别使用静态素材、DOM 和视频</h2>
-        <div class="solution-grid">
-          <article class="solution-card">
-            <span class="card-label">Static</span>
-            <h3>椰子树</h3>
-            <ul>
-              <li>正式实现前制作不带椰子的静态树图。</li>
-              <li>使用静态图片展示椰子树，不再播放树的抖动动画。</li>
-              <li>六颗椰子的初始位置通过独立布局工具配置。</li>
-              <li>更换树资源时，需要在布局工具中重新完成位置对齐。</li>
-            </ul>
-          </article>
-
-          <article class="solution-card dom">
-            <span class="card-label">DOM</span>
-            <h3>树上椰子</h3>
-            <ul>
-              <li>正式实现前制作透明背景的独立椰子图。</li>
-              <li>六颗椰子使用独立 DOM 节点展示，并按照布局工具提供的位置放置在树上。</li>
-              <li>运行时显示椰子文字，保留独立点击、音频和显隐能力。</li>
-            </ul>
-          </article>
-
-          <article class="solution-card dom">
-            <span class="card-label">DOM Motion</span>
-            <h3>椰子掉落与拖拽</h3>
-            <ul>
-              <li>不使用 AI 视频表现椰子掉落。</li>
-              <li>直接移动当前椰子 DOM 节点完成掉落效果。</li>
-              <li>掉落完成后继续使用同一节点进行拖拽、命中判断和错误返回。</li>
-            </ul>
-          </article>
-
-          <article class="solution-card video">
-            <span class="card-label">AI Video</span>
-            <h3>爆炸反馈</h3>
-            <ul>
-              <li>爆炸只承担视觉反馈，不包含动态文字、点击或拖拽行为。</li>
-              <li>使用 AI 生成视频替换。</li>
-              <li>沿用主报告中的 WebM、MOV 和 PNG 图集三格式分流方案。</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="section-4" class="report-section">
-      <div class="section-index"><span>04</span>Trade-offs</div>
+      <div class="section-index"><span>03</span>Trade-offs</div>
       <div class="section-body">
         <p class="eyebrow">删除与降级</p>
-        <h2>移除 DragonBones 后，核心玩法保留，部分骨骼视觉效果取消或简化</h2>
+        <h2>替代现有动画后，核心玩法保留，部分视觉效果取消或简化</h2>
         <div class="change-grid">
           <div class="change-panel remove">
             <span class="detail-label">Remove</span>
             <h3>删除的内容</h3>
             <ol>
-              <li><strong>树的抖动动作</strong><span>删除树干、树叶整体抖动的 `shake` 动画。</span></li>
-              <li><strong>椰子与树枝的骨骼联动</strong><span>不再保留六颗椰子跟随树枝产生的独立位移和旋转。</span></li>
-              <li><strong>复杂的前后遮挡</strong><span>DOM 椰子使用固定显示层级。</span></li>
-              <li><strong>骨骼节点位置跟踪</strong><span>不再依赖动画运行时提供节点位置。</span></li>
+              <li><strong>树的抖动动作</strong><span>树改为静态资源，删除树干、树叶的整体抖动效果。</span></li>
+              <li><strong>椰子与树枝的联动效果</strong><span>椰子改为独立交互元素，不再保留跟随树枝产生的位移和旋转。</span></li>
+              <li><strong>复杂的前后遮挡</strong><span>独立椰子元素使用固定显示层级。</span></li>
+              <li><strong>动画位置跟踪</strong><span>不再依赖原动画提供椰子位置。</span></li>
             </ol>
           </div>
 
@@ -758,53 +780,56 @@
             <span class="detail-label">Reduce</span>
             <h3>降级的内容</h3>
             <ol>
-              <li><strong>六套独立掉落动画</strong><span>`fall_0` 至 `fall_5` 降级为 DOM 节点的通用掉落动画。</span></li>
+              <li><strong>六套独立掉落动画</strong><span>六套不同的掉落轨迹降级为独立椰子元素的通用掉落动画。</span></li>
               <li><strong>掉落过程中的复杂变化</strong><span>不再要求复现复杂弧线、独立旋转、缩放和树枝脱离效果。</span></li>
-              <li><strong>骨骼坐标交接</strong><span>改为由同一 DOM 椰子完成掉落和后续拖拽。</span></li>
+              <li><strong>动画与拖拽的位置衔接</strong><span>改为由同一个椰子元素完成掉落和后续拖拽。</span></li>
             </ol>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="section-5" class="report-section">
-      <div class="section-index"><span>05</span>Capabilities</div>
+    <section id="section-4" class="report-section">
+      <div class="section-index"><span>04</span>Capabilities</div>
       <div class="section-body">
         <p class="eyebrow">预计可保留的核心能力</p>
-        <h2>核心玩法由普通页面节点和业务逻辑继续承担</h2>
+        <h2>核心玩法由独立页面元素和业务逻辑继续承担</h2>
         <div class="capability-grid">
-          <div class="capability"><div><strong>固定布局</strong><span>通过布局工具配置六颗椰子的固定位置。</span></div></div>
+          <div class="capability"><div><strong>固定布局</strong><span>通过布局工具配置六颗椰子的位置和尺寸。</span></div></div>
           <div class="capability"><div><strong>动态文字</strong><span>椰子上显示动态字母或单词。</span></div></div>
-          <div class="capability"><div><strong>题目分配</strong><span>题目与椰子位置的运行时分配。</span></div></div>
+          <div class="capability"><div><strong>题目分配</strong><span>模板根据题目分配椰子位置。</span></div></div>
           <div class="capability"><div><strong>独立点击</strong><span>单独点击椰子播放对应音频。</span></div></div>
           <div class="capability"><div><strong>掉落与拖拽</strong><span>椰子掉落后继续用于拖拽。</span></div></div>
-          <div class="capability"><div><strong>命中判断</strong><span>保留正确和错误命中判断。</span></div></div>
+          <div class="capability"><div><strong>结果判断</strong><span>判断拖拽结果是否正确。</span></div></div>
           <div class="capability"><div><strong>错误返回</strong><span>错误后返回原位。</span></div></div>
           <div class="capability"><div><strong>正确隐藏</strong><span>正确后隐藏对应椰子。</span></div></div>
           <div class="capability"><div><strong>反馈与完成</strong><span>保留爆炸反馈和完成状态。</span></div></div>
+          <div class="capability"><div><strong>中央预览</strong><span>保留完成单词后的预览和音频触发。</span></div></div>
         </div>
       </div>
     </section>
 
-    <section id="section-6" class="report-section">
-      <div class="section-index"><span>06</span>Boundaries</div>
+    <section id="section-5" class="report-section">
+      <div class="section-index"><span>05</span>Boundaries</div>
       <div class="section-body">
         <p class="eyebrow">方案边界</p>
-        <h2>当前只判断方案可行性，交互效果和动画参数在正式实现阶段确定</h2>
+        <h2>职责边界已明确，资源制作和具体效果在正式实现阶段确定</h2>
         <div class="boundary-grid">
           <div class="boundary-panel current">
             <span class="detail-label">Current status</span>
-            <h3>尚未完成 DEMO 验证</h3>
-            <p>当前结论基于现有动画职责和交互流程分析，不表示 DOM 替代方案已经实现或验收。</p>
+            <h3>DEMO 验证需要先完成资源拆分</h3>
+            <p>当前树、椰子、掉落和反馈由同一套动画资源共同提供，尚不能直接生成可用于替代的独立视频和交互素材。需要先完成静态树、独立椰子和展示动画的资源拆分，再进行 DEMO 验证。</p>
           </div>
           <div class="boundary-panel details">
             <span class="detail-label">Implementation details</span>
             <h3>正式实现阶段确定</h3>
             <ul class="plain-list">
-              <li>点击后的具体交互顺序。</li>
-              <li>DOM 掉落动画的轨迹、时长和缓动参数。</li>
+              <li>制作不带椰子的静态树图和透明背景椰子图。</li>
+              <li>布局工具输出六颗椰子的位置和尺寸。</li>
+              <li>椰子掉落的轨迹、时长和移动节奏。</li>
               <li>动画期间的交互冲突处理。</li>
-              <li>爆炸视频的画面尺寸、帧率和具体视觉效果。</li>
+              <li>爆炸媒体资源的显示尺寸、相对位置和具体视觉效果。</li>
+              <li>中央预览保留动态效果，还是使用静态图片。</li>
             </ul>
           </div>
         </div>
@@ -813,7 +838,7 @@
   </main>
 
   <footer>
-    <div class="content" style="padding:0">KJ_QAP_MW_v2 交互动画无 DragonBones 替代可行性说明</div>
+    <div class="content" style="padding:0">KJ_QAP_MW_v2 交互动画替代可行性说明</div>
   </footer>
 </body>
 </html>
