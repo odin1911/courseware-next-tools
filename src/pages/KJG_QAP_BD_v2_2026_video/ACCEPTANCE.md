@@ -10,6 +10,31 @@ yarn dev --host 0.0.0.0
 
 默认本机地址为 `http://127.0.0.1:5173`。手机验收时，手机与电脑需连接同一局域网，并把链接中的 `127.0.0.1` 替换为电脑局域网 IP，例如 `192.168.68.65`。
 
+## 更新 mock 数据
+
+mock 文件位于 `src/shared/core/mock/KJG_QAP_BD_v2.json`。从正式预览链接中取得 `businessContentUuid` 和 `accessToken`，在项目根目录执行：
+
+```sh
+read "MOCK_UUID?businessContentUuid: "
+read -s "MOCK_TOKEN?accessToken: "
+echo
+
+curl -fsSL \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer $MOCK_TOKEN" \
+  "https://aosp-gateway.beta.saybot.net/ace-kellis/api/v2/preview/courseware_next/$MOCK_UUID" \
+  -o /tmp/KJG_QAP_BD_v2.raw.json
+
+jq '.exercises_data = .exercises_data[0]' \
+  /tmp/KJG_QAP_BD_v2.raw.json \
+  > /tmp/KJG_QAP_BD_v2.json
+
+mv /tmp/KJG_QAP_BD_v2.json src/shared/core/mock/KJG_QAP_BD_v2.json
+unset MOCK_TOKEN
+```
+
+预览接口返回的 `exercises_data` 是数组；当前 mock 只对应一个题目，因此保存前取第一项，保持现有文件结构。更新后使用“新模板：自动选择格式”链接验证，不需要在链接中提供 UUID 和 token，也不要指定 `renderer`。
+
 ## 验收责任
 
 - WebM 与 PNG 图集属于自动验收门槛：覆盖资源清单、实际 WebM 加载、强制图集、视频错误降级、循环/完成、暂停恢复和关键资源位置。
